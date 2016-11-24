@@ -1,0 +1,210 @@
+C51 COMPILER V9.00   TBCFRAME                                                              03/23/2015 18:54:10 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE TBCFRAME
+OBJECT MODULE PLACED IN .\ObjFile\TbcFrame.obj
+COMPILER INVOKED BY: H:\Keil\C51\BIN\C51.EXE SrcFile\Frame\TbcFrame.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFil
+                    -e\Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD_) DEBUG OBJECTEXTEND PRINT(.\LstFile\T
+                    -bcFrame.lst) OBJECT(.\ObjFile\TbcFrame.obj)
+
+line level    source
+
+   1          #define _TBCFRAME_C_
+   2          #include "TBCFRAME.H"
+   3          #include "TBCFUNC.H"
+   4          #include "DEBUG.H"
+   5          
+   6          
+   7          
+   8          void vTbcVerify(void)
+   9          {
+  10   1          UINT16 i,j; 
+  11   1              DebugPrintf("Call Function:vTbcVerify() in File:(%s),Line:%d,\r\n", __FILE__,(UINT16)__LINE__);
+  12   1              vScu_TbcClkEn();
+  13   1              switch(CMD_INS)
+  14   1              {
+  15   2                       case 0x02://02 02 xx 00 00 
+  16   2                            vTbcInit();
+  17   2                                vScu_TbcWakeupEn();
+  18   2                                if(CMD_P1==0x00)
+  19   2                                {
+  20   3                            vTbc_Int10SEn();
+  21   3                                }
+  22   2                                else if(CMD_P1==0x01)
+  23   2                                {
+  24   3                                        vTbc_Int1HzEn();
+  25   3                                }
+  26   2                                else if(CMD_P1==0x02)
+  27   2                                {
+  28   3                                        vTbc_Int2HzEn();
+  29   3                                }
+  30   2                                else
+  31   2                                {
+  32   3                                        vTbc_Int60SEn();
+  33   3                                }
+  34   2                                //DebugPrintf("TBCINTSTS=%02bx\r\n",TBCINTSTS);
+  35   2                        vScu_TbcIntEn();
+  36   2                                
+  37   2                                while(1)
+  38   2                                {
+  39   3                                        //vTbc_ReadCurCounter();
+  40   3                                        vTbc_StartDis();//清TBC 计数器，
+  41   3                                        vTbc_StartEn();//清TBC 计数器，
+  42   3                                        vScu_SuspendModeEn();             
+  43   3                                        DebugPrintf("TBC_COUNT_VALUE Cur=%08lx\r\n",TBC_COUNT_VALUE);
+  44   3                                        DebugPrintf("_TBC_FLAG_=%08lx\r\n",_TBC_FLAG_);
+  45   3                                }
+  46   2                                 
+  47   2                            break;
+  48   2                       case 0x03://02 03 xx xx 00 
+  49   2                                    
+  50   2                                vScu_TbcClkEn();
+  51   2                                if(CMD_P1==0x00)
+  52   2                                {
+  53   3                                        for(i=0;i<0x400;i++)
+C51 COMPILER V9.00   TBCFRAME                                                              03/23/2015 18:54:10 PAGE 2   
+
+  54   3                                        {
+  55   4                                            DebugPrintf("ppm=%d\r\n",i);
+  56   4                                                vTBC_ADJ(i);
+  57   4                                                //TBCADJL=0x87;
+  58   4                                        //TBCADJH=0x77;
+  59   4                                                DebugPrintf("TBCADJL=%02bx\r\n",TBCADJL);
+  60   4                                                DebugPrintf("TBCADJH=%02bx\r\n",TBCADJH);
+  61   4                                        }
+  62   3                                }
+  63   2                                else
+  64   2                                {
+  65   3                                        for(i=0;i<0x400;i++)
+  66   3                                        {
+  67   4                                            DebugPrintf("ppm=-%d\r\n",i);
+  68   4                                                i|=0x8000;
+  69   4                                                vTBC_ADJ(i);
+  70   4                                                //TBCADJL=0x87;
+  71   4                                        //TBCADJH=0x77;
+  72   4                                                DebugPrintf("TBCADJL=%02bx\r\n",TBCADJL);
+  73   4                                                DebugPrintf("TBCADJH=%02bx\r\n",TBCADJH);
+  74   4                                                i&=0x7fff;
+  75   4                                        }
+  76   3                                }                       
+  77   2                            break;
+  78   2                        case 0x04://02 04 xx xx 00                  
+  79   2                                vTbcInit();
+  80   2                                if(CMD_P1==0X01)      //+1024PPM
+  81   2                                {
+  82   3                                    TBCADJL=0xff;
+  83   3                                    TBCADJH=0x87;
+  84   3                                }
+  85   2                                else //-1024ppm
+  86   2                                {
+  87   3                                        TBCADJL=0xfe;
+  88   3                                    TBCADJH=0x77;
+  89   3                                
+  90   3                                }
+  91   2                                DebugPrintf("TBCADJL=%02bx\r\n",TBCADJL);
+  92   2                                DebugPrintf("TBCADJH=%02bx\r\n",TBCADJH);                       
+  93   2                                
+  94   2                                vScu_TbcWakeupEn();
+  95   2                        //vTbc_Int1SEn();                       
+  96   2                        //vScu_TbcIntEn();
+  97   2                                
+  98   2                                while(1)
+  99   2                                {
+ 100   3                                        vTbc_ReadCurCounter();
+ 101   3                                        //vScu_SuspendModeEn();                   
+ 102   3                                        DebugPrintf("TBC_COUNT_VALUE Cur=%08lx\r\n",TBC_COUNT_VALUE);
+ 103   3                                        //DebugPrintf("_TBC_FLAG_=%08lx\r\n",_TBC_FLAG_);
+ 104   3                                        vTbc_ReadBakCounter();
+ 105   3                                        DebugPrintf("RTC Bak=%08lx\r\n",TBC_COUNT_VALUE);
+ 106   3                                }                
+ 107   2                            break;
+ 108   2                   case 0x05://02 05 xx xx 00
+ 109   2                           vTbcInit();
+ 110   2                               vTBC_ADJ(0);
+ 111   2                               i=0;
+ 112   2                               //开启定时器中断
+ 113   2                               //ucSysClkChange((UINT8)i);    
+ 114   2                               //vTimer2Start(0x03,0x01,0xff,(0x01<<4));
+ 115   2                               vScu_SetSysClk32K();
+C51 COMPILER V9.00   TBCFRAME                                                              03/23/2015 18:54:10 PAGE 3   
+
+ 116   2                               DebugPrintf("Start RTC Cur=%08lx\r\n",TBC_COUNT_VALUE);
+ 117   2                               vTbc_ReadBakCounter();
+ 118   2                               DebugPrintf("RTC Bak=%08lx\r\n",TBC_COUNT_VALUE);
+ 119   2                           do{                            
+ 120   3                              
+ 121   3                                      //ucSysClkChange((UINT8)i);
+ 122   3                                      //vScu_Osc2MEn();
+ 123   3                                      //vTbc_ReadCurCounter();
+ 124   3                                      //vScu_SetSysClk32K();              
+ 125   3                                      //DebugPrintf("RTC Cur=%08lx\r\n",TBC_COUNT_VALUE);
+ 126   3                                      //vTbc_ReadBakCounter();
+ 127   3                                      //DebugPrintf("RTC Bak=%08lx\r\n",TBC_COUNT_VALUE);
+ 128   3                                      switch(i%4)
+ 129   3                                      {
+ 130   4                                              case 0:
+ 131   4                                                   j=0x3ff;
+ 132   4                                                       break;
+ 133   4                                              case 1:
+ 134   4                                                   j=0x7fe;
+ 135   4                                                       break;
+ 136   4                                              case 2:
+ 137   4                                                   j=0x3d18;
+ 138   4                                                       break;
+ 139   4                                              case 3:
+ 140   4                                                   j=0x7a36;
+ 141   4                                                       break;
+ 142   4                                              default:
+ 143   4                                                   break;
+ 144   4                                      }
+ 145   3                                  vDelay(j);
+ 146   3                                                  
+ 147   3                                      vTbc_ReadCurCounter();
+ 148   3                                      vScu_SetSysClk32K();                
+ 149   3                                      DebugPrintf("RTC Cur=%08lx\r\n",TBC_COUNT_VALUE);
+ 150   3                                      vTbc_ReadBakCounter();
+ 151   3                                      DebugPrintf("RTC Bak=%08lx\r\n",TBC_COUNT_VALUE);
+ 152   3      
+ 153   3                                      ucSysClkChange((UINT8)++i);
+ 154   3                               }while(1);//while(ucSysClkChange(i++));
+ 155   2                           break;
+ 156   2      
+ 157   2                       default:
+ 158   2                           vTbcInit();
+ 159   2                               vTBC_ADJ(0);
+ 160   2                               i=0;
+ 161   2                               //开启定时器中断
+ 162   2                               //ucSysClkChange((UINT8)i);    
+ 163   2                               vTimer2Start(0x03,0x01,0x7f,(0x01<<4));
+ 164   2                               vScu_SetSysClk32K();
+ 165   2                           do{                            
+ 166   3                                      vDelay(i++);
+ 167   3                                      //ucSysClkChange((UINT8)i);
+ 168   3                                      //vScu_Osc2MEn();
+ 169   3                                      //vTbc_ReadCurCounter();
+ 170   3                                      //vScu_SetSysClk32K();              
+ 171   3                                      //DebugPrintf("RTC Cur=%08lx\r\n",TBC_COUNT_VALUE);
+ 172   3                                      //vTbc_ReadBakCounter();
+ 173   3                                      //DebugPrintf("RTC Bak=%08lx\r\n",TBC_COUNT_VALUE);
+ 174   3                                      //ucSysClkChange(i);
+ 175   3                               }while(1);//while(ucSysClkChange(i++));
+ 176   2                           break;
+ 177   2              }
+C51 COMPILER V9.00   TBCFRAME                                                              03/23/2015 18:54:10 PAGE 4   
+
+ 178   1              DebugPrintf("************Excute CMD_INS:%02bx Over************\r\n",CMD_INS);
+ 179   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1483    ----
+   CONSTANT SIZE    =    280    ----
+   XDATA SIZE       =      4       4
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,16 @@
+---- g_ModfyPwFlag Matches (15 in 4 files) ----
+Main.c (srcfile\startup):	if(g_ModfyPwFlag == 1)					
+Main.c (srcfile\startup):		g_ModfyPwFlag = 0;
+OtpFrame.c (srcfile\frame):UINT8 idata g_ModfyPwFlag _at_ 0x38;
+OtpFrame.c (srcfile\frame):							g_ModfyPwFlag = 1;
+OtpFrame.c (srcfile\frame):					if(g_ModfyPwFlag == 0)
+OtpFrame.c (srcfile\frame):					 //g_ModfyPwFlag = 0;
+OtpFrame.c (srcfile\frame):							g_ModfyPwFlag = 1;
+OtpFrame.c (srcfile\frame):	if(g_ModfyPwFlag == 1)
+OtpFrame.c (srcfile\frame):	if(g_ModfyPwFlag==1)
+OtpFrame.c (srcfile\frame):			if(g_ModfyPwFlag==2)
+OtpFrame.c (srcfile\frame):		if(g_ModfyPwFlag==1)
+OtpFrame.c (srcfile\frame):				g_ModfyPwFlag = 2;
+OtpFrame.c (srcfile\frame):					g_ModfyPwFlag = 0;
+OtpFrame.h (srcfile\frame\inc):extern UINT8 idata g_ModfyPwFlag;
+OtpFunc.h (srcfile\func\inc)://extern u1 g_ModfyPwFlag;

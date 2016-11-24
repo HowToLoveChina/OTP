@@ -1,0 +1,51 @@
+C51 COMPILER V9.00   RNGFRAME                                                              03/23/2015 19:20:21 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE RNGFRAME
+OBJECT MODULE PLACED IN .\ObjFile\RngFrame.obj
+COMPILER INVOKED BY: H:\Keil\C51\BIN\C51.EXE SrcFile\Frame\RngFrame.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFil
+                    -e\Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD_) DEBUG OBJECTEXTEND PRINT(.\LstFile\R
+                    -ngFrame.lst) OBJECT(.\ObjFile\RngFrame.obj)
+
+line level    source
+
+   1          #define _RNGRAME_C_     
+   2          #include "RNGFRAME.H" 
+   3          #include "Debug.H"
+   4          #include "UARTFRAME.H"
+   5          #include "UARTFUNC.H"
+   6          
+   7          void vRngVerify(void)
+   8          {
+   9   1      #if 1
+  10   1         UINT8 rngMode;
+  11   1         do{
+  12   2                 for(rngMode=0;rngMode<8;rngMode++)
+  13   2                 {          
+  14   3                          vRngStartInit(rngMode<<1,(rngMode<<1));
+  15   3                              vRngData(g_UART_COM_BUF,64);
+  16   3                              vRngClose();
+  17   3                              DebugPrintf("Rng Mode %02bx\r\n",rngMode);
+  18   3                              //sprintf(g_UART_COM_BUF,"%10lu",RNGDATA);
+  19   3                              DebugPrintBuf(g_UART_COM_BUF, 64, "RNGDATA:");
+  20   3      
+  21   3                  vDelay(1000);               
+  22   3                              
+  23   3                 }
+  24   2         }while(0);
+  25   1      #endif
+  26   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    171    ----
+   CONSTANT SIZE    =     41    ----
+   XDATA SIZE       =      1       3
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

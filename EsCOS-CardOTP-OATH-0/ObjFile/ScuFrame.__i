@@ -1,0 +1,1 @@
+"SrcFile\Frame\ScuFrame.c" LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFile\Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE (_DEV_BOARD_) DEBUG OBJECTEXTEND PRINT(.\LstFile\ScuFrame.lst) OBJECT(.\ObjFile\ScuFrame.obj)

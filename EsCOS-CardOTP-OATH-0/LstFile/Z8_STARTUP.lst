@@ -1,0 +1,219 @@
+A51 MACRO ASSEMBLER  Z8_STARTUP                                                           11/23/2016 11:58:14 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02
+OBJECT MODULE PLACED IN .\ObjFile\Z8_STARTUP.obj
+ASSEMBLER INVOKED BY: C:\Keil\C51\BIN\A51.EXE SrcFile\StartUp\Z8_STARTUP.A51 SET(LARGE) DEBUG PRINT(.\LstFile\Z8_STARTUP
+                      .lst) OBJECT(.\ObjFile\Z8_STARTUP.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     $nomod51 
+                       2     ;------------------------------------------------------------------------------
+                       3     ;  This file is part of the C51 Compiler package
+                       4     ;  Copyright (c) 1988-2002 Keil Elektronik GmbH and Keil Software, Inc.
+                       5     ;------------------------------------------------------------------------------
+                       6     ;  STARTUP.A51:  This code is executed after processor reset.
+                       7     ;
+                       8     ;  To translate this file use A51 with the following invocation:
+                       9     ;
+                      10     ;     A51 STARTUP.A51
+                      11     ;
+                      12     ;  To link the modified STARTUP.OBJ file to your application use the following
+                      13     ;  BL51 invocation:
+                      14     ;
+                      15     ;     BL51 <your object file list>, STARTUP.OBJ <controls>
+                      16     ;
+                      17     ;------------------------------------------------------------------------------
+                      18     ;
+                      19     ;  User-defined Power-On Initialization of Memory
+                      20     ;
+                      21     ;  With the following EQU statements the initialization of memory
+                      22     ;  at processor reset can be defined:
+                      23     ;
+                      24     ;               ; the absolute start-address of IDATA memory is always 0
+  0100                25     IDATALEN        EQU     100H     ; the length of IDATA memory in bytes.
+                      26     ;
+  0000                27     XDATASTART      EQU     0H      ; the absolute start-address of XDATA memory
+  0C00                28     XDATALEN        EQU     0C00H      ; the length of XDATA memory in bytes.
+                      29     ;
+  0000                30     PDATASTART      EQU     0H      ; the absolute start-address of PDATA memory
+  0000                31     PDATALEN        EQU     0H      ; the length of PDATA memory in bytes.
+                      32     
+  0000                33     USER_APP_OFF    EQU         0000H       ; The first address of your APP
+                      34     
+                      35     ;
+                      36     ;  Notes:  The IDATA space overlaps physically the DATA and BIT areas of the
+                      37     ;          8051 CPU. At minimum the memory space occupied from the C51 
+                      38     ;          run-time routines must be set to zero.
+                      39     ;------------------------------------------------------------------------------
+                      40     ;
+                      41     ;  Reentrant Stack Initilization
+                      42     ;
+                      43     ;  The following EQU statements define the stack pointer for reentrant
+                      44     ;  functions and initialized it:
+                      45     ;
+                      46     ;  Stack Space for reentrant functions in the SMALL model.
+  0000                47     IBPSTACK        EQU     0       ; set to 1 if small reentrant is used.
+  0100                48     IBPSTACKTOP     EQU     0FFH+1  ; set top of stack to highest location+1.
+                      49     ;
+                      50     ;  Stack Space for reentrant functions in the LARGE model.      
+  0000                51     XBPSTACK        EQU     0       ; set to 1 if large reentrant is used.
+  0000                52     XBPSTACKTOP     EQU     0FFFFH+1; set top of stack to highest location+1.
+                      53     ;
+                      54     ;  Stack Space for reentrant functions in the COMPACT model.    
+  0000                55     PBPSTACK        EQU     0       ; set to 1 if compact reentrant is used.
+  0000                56     PBPSTACKTOP     EQU     0FFFFH+1; set top of stack to highest location+1.
+                      57     ;
+A51 MACRO ASSEMBLER  Z8_STARTUP                                                           11/23/2016 11:58:14 PAGE     2
+
+                      58     ;------------------------------------------------------------------------------
+                      59     ;
+                      60     ;  Page Definition for Using the Compact Model with 64 KByte xdata RAM
+                      61     ;
+                      62     ;  The following EQU statements define the xdata page used for pdata
+                      63     ;  variables. The EQU PPAGE must conform with the PPAGE control used
+                      64     ;  in the linker invocation.
+                      65     ;
+  0000                66     PPAGEENABLE     EQU     0       ; set to 1 if pdata object are used.
+                      67     ;
+  0000                68     PPAGE           EQU     0       ; define PPAGE number.
+                      69     ;
+  00A0                70     PPAGE_SFR       DATA    0A0H    ; SFR that supplies uppermost address byte
+                      71     ;               (most 8051 variants use P2 as uppermost address byte)
+                      72     ;
+                      73     ;------------------------------------------------------------------------------
+                      74     
+                      75     ; Standard SFR Symbols 
+  00E0                76     ACC     DATA    0E0H
+  00F0                77     B       DATA    0F0H
+  0081                78     SP      DATA    81H
+  0082                79     DPL     DATA    82H
+  0083                80     DPH     DATA    83H
+  00A8                81     IE              DATA    0A8H
+  0086                82     DPS             DATA    86H
+  009C                83     SCUCTRL DATA    09CH
+                      84     
+                      85     EXTRN IDATA (_FIRST_POWERON_FLAG_)
+                      86     
+                      87                     NAME    ?C_STARTUP
+                      88     
+                      89     ?C_C51STARTUP   SEGMENT   CODE
+                      90     ?STACK          SEGMENT   IDATA
+                      91     
+----                  92                     RSEG    ?STACK
+0000                  93                             DS      01h
+                      94     
+                      95                     EXTRN CODE (?C_START)
+                      96                     PUBLIC  ?C_STARTUP
+                      97                     
+----                  98                     CSEG    AT      USER_APP_OFF
+                      99                 
+0000 020000   F      100     ?C_STARTUP:     LJMP    STARTUP1
+                     101     
+----                 102                     RSEG    ?C_C51STARTUP
+0000                 103     STARTUP1:
+                     104     
+                     105     
+                     106     ; CHECK IF FIRST POWER ON:
+                     107     ; IF YES: IRAM/XRAM CLEAR BY HARDWARE OR SOFTWARE
+                     108     ; IF NO: DO NOT CLEAR IRAM/XRAM 
+0000 85A8F0          109                                     MOV B, IE
+0003 E4              110                                     CLR A
+0004 F5A8            111                                     MOV IE, A
+                     112     
+0006 7800     F      113                                     MOV R0,#_FIRST_POWERON_FLAG_
+0008 E6              114                                     MOV A,@R0
+                     115     
+                     116                                     ;MOV A,SCUCTRL
+                     117                                     ;ANL A,#0x01
+                     118     
+0009 645A            119                                     XRL A,#0x5a
+000B 601E            120                                     JZ      NOTFIRSTPOWERON
+                     121     
+                     122                                     ;JNZ    NOTFIRSTPOWERON
+                     123     ; IE ENABLE
+A51 MACRO ASSEMBLER  Z8_STARTUP                                                           11/23/2016 11:58:14 PAGE     3
+
+                     124     ;               MOV SCUCTRL,#0x01
+000D 85F0A8          125                                     MOV IE, B 
+                     126     
+                     127         IF IDATALEN <> 0   
+0010 78FF            128                     MOV     R0,#IDATALEN - 1
+0012 E4              129                     CLR     A
+0013                 130     IDATALOOP:      
+0013 F6              131                                     MOV     @R0,A
+0014 D8FD            132                     DJNZ    R0,IDATALOOP
+                     133         ENDIF
+                     134     
+                     135         IF XDATALEN <> 0
+0016 900000          136                     MOV     DPTR,#XDATASTART        
+0019 7F00            137                     MOV     R7,#LOW (XDATALEN)
+                     138         IF (LOW (XDATALEN)) <> 0
+                                             MOV     R6,#(HIGH (XDATALEN)) +1
+                                 ELSE
+001B 7E0C            141                     MOV     R6,#HIGH (XDATALEN)
+                     142         ENDIF
+001D E4              143                     CLR     A
+001E F0              144     XDATALOOP:      MOVX    @DPTR,A
+001F A3              145                     INC     DPTR
+0020 DFFC            146                     DJNZ    R7,XDATALOOP
+0022 DEFA            147                     DJNZ    R6,XDATALOOP
+                     148         ENDIF
+                     149     ;SET RAM VALID FLAG
+0024 759C01          150                                 MOV     SCUCTRL,#0x01
+0027 7800     F      151                                     MOV     R0,#_FIRST_POWERON_FLAG_
+0029 765A            152                                     MOV     @R0,#0x5a
+002B                 153     NOTFIRSTPOWERON:                                                                 
+002B 758100   F      154                                     MOV     SP,#?STACK-1                            
+                     155                     
+002E 020000   F      156                     LJMP    ?C_START
+                     157     
+                     158                     END
+                             
+A51 MACRO ASSEMBLER  Z8_STARTUP                                                           11/23/2016 11:58:14 PAGE     4
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E               T Y P E  V A L U E   ATTRIBUTES
+
+?C_C51STARTUP. . . .  C SEG    0031H       REL=UNIT
+?C_START . . . . . .  C ADDR   -----       EXT
+?C_STARTUP . . . . .  C ADDR   0000H   A   
+?STACK . . . . . . .  I SEG    0001H       REL=UNIT
+ACC. . . . . . . . .  D ADDR   00E0H   A   
+B. . . . . . . . . .  D ADDR   00F0H   A   
+DPH. . . . . . . . .  D ADDR   0083H   A   
+DPL. . . . . . . . .  D ADDR   0082H   A   
+DPS. . . . . . . . .  D ADDR   0086H   A   
+IBPSTACK . . . . . .  N NUMB   0000H   A   
+IBPSTACKTOP. . . . .  N NUMB   0100H   A   
+IDATALEN . . . . . .  N NUMB   0100H   A   
+IDATALOOP. . . . . .  C ADDR   0013H   R   SEG=?C_C51STARTUP
+IE . . . . . . . . .  D ADDR   00A8H   A   
+NOTFIRSTPOWERON. . .  C ADDR   002BH   R   SEG=?C_C51STARTUP
+PBPSTACK . . . . . .  N NUMB   0000H   A   
+PBPSTACKTOP. . . . .  N NUMB   0000H   A   
+PDATALEN . . . . . .  N NUMB   0000H   A   
+PDATASTART . . . . .  N NUMB   0000H   A   
+PPAGE. . . . . . . .  N NUMB   0000H   A   
+PPAGEENABLE. . . . .  N NUMB   0000H   A   
+PPAGE_SFR. . . . . .  D ADDR   00A0H   A   
+SCUCTRL. . . . . . .  D ADDR   009CH   A   
+SP . . . . . . . . .  D ADDR   0081H   A   
+STARTUP1 . . . . . .  C ADDR   0000H   R   SEG=?C_C51STARTUP
+USER_APP_OFF . . . .  N NUMB   0000H   A   
+XBPSTACK . . . . . .  N NUMB   0000H   A   
+XBPSTACKTOP. . . . .  N NUMB   0000H   A   
+XDATALEN . . . . . .  N NUMB   0C00H   A   
+XDATALOOP. . . . . .  C ADDR   001EH   R   SEG=?C_C51STARTUP
+XDATASTART . . . . .  N NUMB   0000H   A   
+_FIRST_POWERON_FLAG_  I ADDR   -----       EXT
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

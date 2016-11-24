@@ -1,0 +1,34 @@
+SET C51INC=C:\Keil\C51\Inc
+SET C51LIB=C:\Keil\C51\Lib
+SET CPU_TYPE=8052 (all Variants)
+SET CPU_VENDOR=Generic
+SET UV2_TARGET=Z8D16R-2
+SET CPU_XTAL=0x00B71B00
+"C:\Keil\C51\BIN\A51.EXE" @.\ObjFile\Z8_STA~1._IA
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\Main.__i
+"C:\Keil\C51\BIN\A51.EXE" @.\ObjFile\HARDAP~1._IA
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\TbcFunc.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\OtpFunc.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\LcdFunc.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\AdcFunc.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\ScuFunc.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\UartFunc.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\TIMERF~1.__I
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\WdtFunc.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\Hmac.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\Sha1.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\I2C.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\Uc8118.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\IsrFrame.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\OtpFrame.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\AdcFrame.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\SM4PRO~1.__I
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\UARTFR~1.__I
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\PUTCHAR.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\Debug.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\Crc.__i
+"C:\Keil\C51\BIN\A51.EXE" @.\ObjFile\Crc._ia
+"C:\Keil\C51\BIN\A51.EXE" @.\ObjFile\BIGAPI~1._IA
+"C:\Keil\C51\BIN\BL51.EXE" @.\ObjFile\Z8D16R_2.lnp
+"C:\Keil\C51\BIN\OH51.EXE" ".\ObjFile\Z8D16R_2" 
+.\Tool\gen_bin.bat

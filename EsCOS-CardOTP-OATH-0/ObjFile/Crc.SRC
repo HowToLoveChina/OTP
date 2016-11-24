@@ -1,0 +1,353 @@
+; .\ObjFile\Crc.SRC generated from: SrcFile\Lib\Crc.c
+; COMPILER INVOKED BY:
+;        C:\Keil\C51\BIN\C51.EXE SrcFile\Lib\Crc.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFile\Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD_,_FPGA_DEMO_EN_) DEBUG OBJECTEXTEND PRINT(.\LstFile\Crc.lst) SRC(.\ObjFile\Crc.SRC)
+
+$NOMOD51
+
+NAME	CRC
+
+SCULCDSWEN	DATA	0F9H
+SCUPC	DATA	09EH
+RNGDATA	DATA	0EFH
+AC	BIT	0D0H.6
+EA	BIT	0A8H.7
+SCUPM	DATA	092H
+SCUOSCCTRL	DATA	090H
+IOMP0PU	DATA	0C2H
+SCURAMSWEN	DATA	0FAH
+IOMP1PU	DATA	0CAH
+IE	DATA	0A8H
+RNGMODE	DATA	0EDH
+KBCSTAT	DATA	0A0H
+SCUSO	DATA	094H
+DPH2	DATA	085H
+DPL2	DATA	084H
+SCURNGC	DATA	09DH
+SCUWT	DATA	095H
+ES	BIT	0A8H.4
+IP	DATA	0B8H
+UARTBUF	DATA	0D4H
+CY	BIT	0D0H.7
+UARTCON	DATA	0D5H
+TBCDR0	DATA	0DEH
+TBCDR1	DATA	0DDH
+TBCDR2	DATA	0DCH
+SCUCTRL	DATA	09CH
+PS	BIT	0B8H.4
+SP	DATA	081H
+TBCDR3	DATA	0DBH
+IOMP0DOUT	DATA	0C7H
+OV	BIT	0D0H.2
+IOMP1DOUT	DATA	0CFH
+SCUIE0	DATA	098H
+SCUIE1	DATA	099H
+TM0CDATA	DATA	0B0H
+PCON	DATA	087H
+TM1CDATA	DATA	0B1H
+TM2CDATA	DATA	0A0H
+TM0CON	DATA	0B3H
+TM3CDATA	DATA	0A1H
+TM1CON	DATA	0B4H
+TM1MOD	DATA	0B2H
+SM3CON	DATA	0F4H
+TM2CON	DATA	0A3H
+TM2MOD	DATA	0A2H
+TCON	DATA	088H
+TM3CON	DATA	0A4H
+SCUIS0	DATA	09AH
+SCUWE0	DATA	096H
+SCUIS1	DATA	09BH
+SCUWE1	DATA	097H
+TM1INTSTS	DATA	0B5H
+TM2INTSTS	DATA	0A5H
+IE0	BIT	088H.1
+IE1	BIT	088H.3
+SM3INT	DATA	0F5H
+B	DATA	0F0H
+TBCINTSTS	DATA	0DFH
+IOMP0DIN	DATA	0C6H
+IOMP1DIN	DATA	0CEH
+SCUMCG	DATA	091H
+IOMP0DIR	DATA	0C1H
+ACC	DATA	0E0H
+IOMP1DIR	DATA	0C9H
+ET0	BIT	0A8H.1
+ET1	BIT	0A8H.3
+TF0	BIT	088H.5
+TF1	BIT	088H.7
+EX0	BIT	0A8H.0
+IT0	BIT	088H.0
+EX1	BIT	0A8H.2
+IT1	BIT	088H.2
+P	BIT	0D0H.0
+WDTMOD	DATA	0E5H
+WDTCON	DATA	0E4H
+RNGINT	DATA	0EEH
+PT0	BIT	0B8H.1
+RS0	BIT	0D0H.3
+PT1	BIT	0B8H.3
+IOMP0ISR	DATA	0C8H
+RS1	BIT	0D0H.4
+IOMP1ISR	DATA	0BCH
+WDTINTSTS	DATA	0E6H
+IOMP0INTS1	DATA	0C4H
+PX0	BIT	0B8H.0
+IOMP1INTS1	DATA	0CCH
+IOMP0INTS2	DATA	0C5H
+PX1	BIT	0B8H.2
+IOMP1INTS2	DATA	0CDH
+SCUPMP	DATA	093H
+KBCDAT1	DATA	0A2H
+DPH	DATA	083H
+KBCDAT2	DATA	0A3H
+DPL	DATA	082H
+KBCCR	DATA	0A1H
+DPS	DATA	086H
+TBCSTART	DATA	0DAH
+SCUTMRCG	DATA	0F8H
+TBCADJH	DATA	0D9H
+F0	BIT	0D0H.5
+TBCADJL	DATA	0D8H
+RNGSTART	DATA	0ECH
+PSW	DATA	0D0H
+IOMP0PD	DATA	0C3H
+IOMCR	DATA	0C0H
+UARTSTAT	DATA	0D6H
+IOMP1PD	DATA	0CBH
+?PR?_u16CrcCompute?CRC                   SEGMENT CODE 
+?XD?_u16CrcCompute?CRC                   SEGMENT XDATA OVERLAYABLE 
+?PR?_ucEndianChange?CRC                  SEGMENT CODE 
+	PUBLIC	_ucEndianChange
+	PUBLIC	_u16CrcCompute
+
+	RSEG  ?XD?_u16CrcCompute?CRC
+?_u16CrcCompute?BYTE:
+       addr?040:   DS   2
+	ORG  2
+        len?041:   DS   2
+	ORG  4
+        crc?042:   DS   2
+; #define _CRC_C_
+; #include "CRC.H"
+; #include "OtpFunc.H"
+; #include "DEBUG.H"
+; 
+; 
+; 
+; /********************************************************************
+; Function name:      u16CrcCompute
+; Input parameters:
+;     addr, XBUS ADDRESS of the data;
+;     len, the length of the data;
+;     crc, crc initialization value;
+; Return:
+;     crc value;
+; Function:
+;     CRC value direct compute, poly given as defined;
+; ********************************************************************/
+; UINT16 u16CrcCompute(UINT16 addr, UINT16 len, UINT16 crc)
+
+	RSEG  ?PR?_u16CrcCompute?CRC
+_u16CrcCompute:
+	USING	0
+			; SOURCE LINE # 19
+	MOV  	DPTR,#addr?040
+	MOV  	A,R6
+	MOVX 	@DPTR,A
+	INC  	DPTR
+	MOV  	A,R7
+	MOVX 	@DPTR,A
+	INC  	DPTR
+	MOV  	A,R4
+	MOVX 	@DPTR,A
+	INC  	DPTR
+	MOV  	A,R5
+	MOVX 	@DPTR,A
+	INC  	DPTR
+	MOV  	A,R2
+	MOVX 	@DPTR,A
+	INC  	DPTR
+	MOV  	A,R3
+	MOVX 	@DPTR,A
+; {
+			; SOURCE LINE # 20
+;     UINT16 i, j;
+;     UINT8 uc;
+;     for ( j = 0; j < len; j++)
+			; SOURCE LINE # 23
+;---- Variable 'j?044' assigned to Register 'R4/R5' ----
+	CLR  	A
+	MOV  	R5,A
+	MOV  	R4,A
+?C0001:
+	SETB 	C
+	MOV  	DPTR,#len?041+01H
+	MOVX 	A,@DPTR
+	SUBB 	A,R5
+	MOV  	DPTR,#len?041
+	MOVX 	A,@DPTR
+	SUBB 	A,R4
+	JC   	?C0002
+;     {
+			; SOURCE LINE # 24
+;         uc = CBYTE[addr + j];		
+			; SOURCE LINE # 25
+	MOV  	DPTR,#addr?040+01H
+	MOVX 	A,@DPTR
+	ADD  	A,R5
+	MOV  	R7,A
+	MOV  	DPTR,#addr?040
+	MOVX 	A,@DPTR
+	ADDC 	A,R4
+	MOV  	DPL,R7
+	MOV  	DPH,A
+	CLR  	A
+	MOVC 	A,@A+DPTR
+;---- Variable 'uc?045' assigned to Register 'R1' ----
+	MOV  	R1,A
+;         for ( i = 0; i < 8; i++)
+			; SOURCE LINE # 26
+;---- Variable 'i?043' assigned to Register 'R2/R3' ----
+	CLR  	A
+	MOV  	R3,A
+	MOV  	R2,A
+?C0004:
+;         {
+			; SOURCE LINE # 27
+;             crc = ((uc ^ (UINT8)(crc >> 8)) & 0x80) ? ((crc << 1) ^ CRC_DFE_POLY) : (crc << 1);
+			; SOURCE LINE # 28
+	MOV  	DPTR,#crc?042
+	MOVX 	A,@DPTR
+	XRL  	A,R1
+	JNB  	ACC.7,?C0007
+	INC  	DPTR
+	MOVX 	A,@DPTR
+	ADD  	A,ACC
+	MOV  	R7,A
+	MOV  	DPTR,#crc?042
+	MOVX 	A,@DPTR
+	RLC  	A
+	XRL  	A,#080H
+	MOV  	R6,A
+	MOV  	A,R7
+	XRL  	A,#05H
+	MOV  	R7,A
+	SJMP 	?C0008
+?C0007:
+	MOV  	DPTR,#crc?042+01H
+	MOVX 	A,@DPTR
+	ADD  	A,ACC
+	MOV  	R7,A
+	MOV  	DPTR,#crc?042
+	MOVX 	A,@DPTR
+	RLC  	A
+	MOV  	R6,A
+?C0008:
+	MOV  	DPTR,#crc?042
+	MOV  	A,R6
+	MOVX 	@DPTR,A
+	INC  	DPTR
+	MOV  	A,R7
+	MOVX 	@DPTR,A
+;             uc <<= 1;
+			; SOURCE LINE # 29
+	MOV  	A,R1
+	ADD  	A,ACC
+	MOV  	R1,A
+;         }
+			; SOURCE LINE # 30
+	INC  	R3
+	CJNE 	R3,#00H,?C0011
+	INC  	R2
+?C0011:
+	MOV  	A,R3
+	XRL  	A,#08H
+	ORL  	A,R2
+	JNZ  	?C0004
+;     }
+			; SOURCE LINE # 31
+?C0003:
+	INC  	R5
+	CJNE 	R5,#00H,?C0012
+	INC  	R4
+?C0012:
+	SJMP 	?C0001
+?C0002:
+; 
+;     return crc;
+			; SOURCE LINE # 33
+	MOV  	DPTR,#crc?042
+	MOVX 	A,@DPTR
+	MOV  	R6,A
+	INC  	DPTR
+	MOVX 	A,@DPTR
+	MOV  	R7,A
+; 
+; }
+			; SOURCE LINE # 35
+?C0009:
+	RET  	
+; END OF _u16CrcCompute
+
+; 
+; /********************************************************************
+; Function name:      ucEndianChange
+; Input parameters:
+;     inc, inchar;
+; Return:
+;     outc, endian change of inchar;
+; Function:
+;     endian change of the in BYTE;
+; ********************************************************************/
+; #pragma REGPARMS
+; UINT8 ucEndianChange(UINT8 inchar)
+
+	RSEG  ?PR?_ucEndianChange?CRC
+_ucEndianChange:
+	USING	0
+			; SOURCE LINE # 47
+;---- Variable 'inchar?146' assigned to Register 'R7' ----
+; {
+			; SOURCE LINE # 48
+;     inchar = 0;
+			; SOURCE LINE # 49
+; #pragma asm
+;     CLR A
+	  CLR A
+;     MOV B, A
+	  MOV B, A
+;     MOV R0, #08H
+	  MOV R0, #08H
+;     MOV A, R7
+	  MOV A, R7
+;     CLR C
+	  CLR C
+; ENDIANLOOP:
+	  ENDIANLOOP:
+;     RLC A
+	  RLC A
+;     XCH A, B
+	  XCH A, B
+;     RRC A
+	  RRC A
+;     XCH A, B
+	  XCH A, B
+;     DJNZ R0, ENDIANLOOP
+	  DJNZ R0, ENDIANLOOP
+; 
+	  
+;     XCH A, B
+	  XCH A, B
+;     MOV R7, A
+	  MOV R7, A
+; #pragma endasm
+;     return ACC;
+			; SOURCE LINE # 66
+	MOV  	R7,A
+; }
+			; SOURCE LINE # 67
+?C0010:
+	RET  	
+; END OF _ucEndianChange
+
+	END

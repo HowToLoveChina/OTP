@@ -1,0 +1,99 @@
+C51 COMPILER V9.01   CRC                                                                   11/23/2016 11:58:16 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE CRC
+NO OBJECT MODULE REQUESTED
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE SrcFile\Lib\Crc.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFile\Frame
+                    -\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD_,_FPGA_DEMO_EN_) DEBUG OBJECTEXTEND PRINT(.\L
+                    -stFile\Crc.lst) SRC(.\ObjFile\Crc.SRC)
+
+line level    source
+
+   1          #define _CRC_C_
+   2          #include "CRC.H"
+   3          #include "OtpFunc.H"
+   4          #include "DEBUG.H"
+   5          
+   6          
+   7          
+   8          /********************************************************************
+   9          Function name:      u16CrcCompute
+  10          Input parameters:
+  11              addr, XBUS ADDRESS of the data;
+  12              len, the length of the data;
+  13              crc, crc initialization value;
+  14          Return:
+  15              crc value;
+  16          Function:
+  17              CRC value direct compute, poly given as defined;
+  18          ********************************************************************/
+  19          UINT16 u16CrcCompute(UINT16 addr, UINT16 len, UINT16 crc)
+  20          {
+  21   1          UINT16 i, j;
+  22   1          UINT8 uc;
+  23   1          for ( j = 0; j < len; j++)
+  24   1          {
+  25   2              uc = CBYTE[addr + j];           
+  26   2              for ( i = 0; i < 8; i++)
+  27   2              {
+  28   3                  crc = ((uc ^ (UINT8)(crc >> 8)) & 0x80) ? ((crc << 1) ^ CRC_DFE_POLY) : (crc << 1);
+  29   3                  uc <<= 1;
+  30   3              }
+  31   2          }
+  32   1      
+  33   1          return crc;
+  34   1      
+  35   1      }
+  36          
+  37          /********************************************************************
+  38          Function name:      ucEndianChange
+  39          Input parameters:
+  40              inc, inchar;
+  41          Return:
+  42              outc, endian change of inchar;
+  43          Function:
+  44              endian change of the in BYTE;
+  45          ********************************************************************/
+  46          #pragma REGPARMS
+  47          UINT8 ucEndianChange(UINT8 inchar)
+  48          {
+  49   1          inchar = 0;
+  50   1      #pragma asm
+  51   1          CLR A
+  52   1          MOV B, A
+  53   1          MOV R0, #08H
+C51 COMPILER V9.01   CRC                                                                   11/23/2016 11:58:16 PAGE 2   
+
+  54   1          MOV A, R7
+  55   1          CLR C
+  56   1      ENDIANLOOP:
+  57   1          RLC A
+  58   1          XCH A, B
+  59   1          RRC A
+  60   1          XCH A, B
+  61   1          DJNZ R0, ENDIANLOOP
+  62   1      
+  63   1          XCH A, B
+  64   1          MOV R7, A
+  65   1      #pragma endasm
+  66   1          return ACC;
+  67   1      }
+  68          
+  69          
+  70          
+  71          
+  72          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    180    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       6
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

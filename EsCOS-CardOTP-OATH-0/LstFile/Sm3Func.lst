@@ -1,0 +1,151 @@
+C51 COMPILER V9.00   SM3FUNC                                                               07/18/2016 17:58:42 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE SM3FUNC
+OBJECT MODULE PLACED IN .\ObjFile\Sm3Func.obj
+COMPILER INVOKED BY: H:\Keil\C51\BIN\C51.EXE SrcFile\Func\Sm3Func.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFile\
+                    -Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD_,_FPGA_DEMO_EN_) DEBUG OBJECTEXTEND PRIN
+                    -T(.\LstFile\Sm3Func.lst) TABS(2) OBJECT(.\ObjFile\Sm3Func.obj)
+
+line level    source
+
+   1          #define _SM3FUNC_C_ 
+   2          #include "SM3FUNC.H"
+   3          /********************************************************************
+   4          Function name:       void vSm3Hash(void)
+   5          Input parameters:
+   6              void
+   7          Return:
+   8              void
+   9          Function:
+  10              执行SM3硬件算法，此函数为OTP专用，用户需要将参数与结果0x0380以上的算法区域 
+  11          函数内部不对参数进行判断，因此只支持小于64byte的数据包的HASH运算
+  12          #define ARAM_BASE       (0x0B80)
+  13          #define SM3_A_BASE    (&XBYTE[ARAM_BASE])
+  14          #define SM3_MSG_BASE  (&XBYTE[ARAM_BASE + 32])
+  15          #define SM3_T_BASE    (&XBYTE[ARAM_BASE + 96])
+  16          #define SM3_VA_BASE   SM3_MSG_BASE 
+  17          ********************************************************************/
+  18          
+  19          void vSm3Hash(void)
+  20          {   
+  21   1        SCUMCG |= (1 << 4);
+  22   1          //IV  
+  23   1        //memcpy(SM3_A_BASE, vSM3_IV, 32);
+  24   1        XBYTE[0x0B80]=0x73;
+  25   1        XBYTE[0x0B81]=0x80;
+  26   1        XBYTE[0x0B82]=0x16;
+  27   1        XBYTE[0x0B83]=0x6f;
+  28   1        XBYTE[0x0B84]=0x49;
+  29   1        XBYTE[0x0B85]=0x14;
+  30   1        XBYTE[0x0B86]=0xb2;
+  31   1        XBYTE[0x0B87]=0xb9;
+  32   1      
+  33   1        XBYTE[0x0B88]=0x17;
+  34   1        XBYTE[0x0B89]=0x24;
+  35   1        XBYTE[0x0B8a]=0x42;
+  36   1        XBYTE[0x0B8b]=0xd7;
+  37   1        XBYTE[0x0B8c]=0xda;
+  38   1        XBYTE[0x0B8d]=0x8a;
+  39   1        XBYTE[0x0B8e]=0x06;
+  40   1        XBYTE[0x0B8f]=0x00;
+  41   1      
+  42   1        XBYTE[0x0B90]=0xa9;
+  43   1        XBYTE[0x0B91]=0x6f;
+  44   1        XBYTE[0x0B92]=0x30;
+  45   1        XBYTE[0x0B93]=0xbc;
+  46   1        XBYTE[0x0B94]=0x16;
+  47   1        XBYTE[0x0B95]=0x31;
+  48   1        XBYTE[0x0B96]=0x38;
+  49   1        XBYTE[0x0B97]=0xaa;
+  50   1      
+  51   1        XBYTE[0x0B98]=0xe3;
+  52   1        XBYTE[0x0B99]=0x8d;
+  53   1        XBYTE[0x0B9a]=0xee;
+C51 COMPILER V9.00   SM3FUNC                                                               07/18/2016 17:58:42 PAGE 2   
+
+  54   1        XBYTE[0x0B9b]=0x4d;
+  55   1        XBYTE[0x0B9c]=0xb0;
+  56   1        XBYTE[0x0B9d]=0xfb;
+  57   1        XBYTE[0x0B9e]=0x0e;
+  58   1        XBYTE[0x0B9f]=0x4e;
+  59   1          //T1&&T2  
+  60   1        //memcpy(SM3_T_BASE, vSM3_T, 8);
+  61   1        XBYTE[0x0BE0]=0x79;
+  62   1        XBYTE[0x0BE1]=0xCC;
+  63   1        XBYTE[0x0BE2]=0x45;
+  64   1        XBYTE[0x0BE3]=0x19;
+  65   1        XBYTE[0x0BE4]=0x7A;
+  66   1        XBYTE[0x0BE5]=0x87;
+  67   1        XBYTE[0x0BE6]=0x9D;
+  68   1        XBYTE[0x0BE7]=0x8A;
+  69   1          //message
+  70   1        //memcpy(SM3_MSG_BASE, MessBlock, 64);
+  71   1      
+  72   1        SM3INT |= 0x01;
+  73   1        SM3CON = (SM3CON & 0xFC) | 0x01;
+  74   1        _nop_();
+  75   1        _nop_();
+  76   1        _nop_();     
+  77   1        //while(SM3CON & 0x01);
+  78   1        //memcpy(SM3_VA_BASE, vSM3_IV, 32);
+  79   1        XBYTE[0x0BA0]=0x73;
+  80   1        XBYTE[0x0BA1]=0x80;
+  81   1        XBYTE[0x0BA2]=0x16;
+  82   1        XBYTE[0x0BA3]=0x6f;
+  83   1        XBYTE[0x0BA4]=0x49;
+  84   1        XBYTE[0x0BA5]=0x14;
+  85   1        XBYTE[0x0BA6]=0xb2;
+  86   1        XBYTE[0x0BA7]=0xb9;
+  87   1      
+  88   1        XBYTE[0x0BA8]=0x17;
+  89   1        XBYTE[0x0BA9]=0x24;
+  90   1        XBYTE[0x0BAa]=0x42;
+  91   1        XBYTE[0x0BAb]=0xd7;
+  92   1        XBYTE[0x0BAc]=0xda;
+  93   1        XBYTE[0x0BAd]=0x8a;
+  94   1        XBYTE[0x0BAe]=0x06;
+  95   1        XBYTE[0x0BAf]=0x00;
+  96   1      
+  97   1        XBYTE[0x0BB0]=0xa9;
+  98   1        XBYTE[0x0BB1]=0x6f;
+  99   1        XBYTE[0x0BB2]=0x30;
+ 100   1        XBYTE[0x0BB3]=0xbc;
+ 101   1        XBYTE[0x0BB4]=0x16;
+ 102   1        XBYTE[0x0BB5]=0x31;
+ 103   1        XBYTE[0x0BB6]=0x38;
+ 104   1        XBYTE[0x0BB7]=0xaa;
+ 105   1      
+ 106   1        XBYTE[0x0BB8]=0xe3;
+ 107   1        XBYTE[0x0BB9]=0x8d;
+ 108   1        XBYTE[0x0BBa]=0xee;
+ 109   1        XBYTE[0x0BBb]=0x4d;
+ 110   1        XBYTE[0x0BBc]=0xb0;
+ 111   1        XBYTE[0x0BBd]=0xfb;
+ 112   1        XBYTE[0x0BBe]=0x0e;
+ 113   1        XBYTE[0x0BBf]=0x4e;
+ 114   1      
+ 115   1        SM3INT |= 0x01;
+C51 COMPILER V9.00   SM3FUNC                                                               07/18/2016 17:58:42 PAGE 3   
+
+ 116   1        SM3CON = (SM3CON & 0xFC) | 0x03; //SM3算法运行期间，CPU HOLD，SM3运行完成后，才能向下执行
+ 117   1        _nop_();
+ 118   1        _nop_();
+ 119   1        _nop_();    
+ 120   1        //while(SM3CON & 0x01);
+ 121   1        //memcpy(Digest, SM3_A_BASE, 32); 
+ 122   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    324    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

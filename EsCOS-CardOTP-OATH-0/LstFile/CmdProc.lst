@@ -1,0 +1,89 @@
+C51 COMPILER V9.00   CMDPROC                                                               03/23/2015 16:32:24 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE CMDPROC
+OBJECT MODULE PLACED IN .\ObjFile\CmdProc.obj
+COMPILER INVOKED BY: H:\Keil\C51\BIN\C51.EXE SrcFile\Lib\CmdProc.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFile\F
+                    -rame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD_) DEBUG OBJECTEXTEND PRINT(.\LstFile\CmdP
+                    -roc.lst) OBJECT(.\ObjFile\CmdProc.obj)
+
+line level    source
+
+   1          #define _CMDPROC_C_
+   2          #include "CMDPROC.H" 
+   3          
+   4          void vCmdErr(void)
+   5          {
+   6   1          //DebugPrintf("No Such Cmd\r\n");
+   7   1          DebugPrintf("No Such Cmd:CMD_CLA=%02bx CMD_INS=%02bx\r\n",CMD_CLA,CMD_INS);
+   8   1      
+   9   1              DebugPrintf("Enter vTokenApp Test\r\n");
+  10   1              vTokenApp();
+*** WARNING C206 IN LINE 10 OF SRCFILE\LIB\CMDPROC.C: 'vTokenApp': missing function-prototype
+  11   1        
+  12   1      }
+  13                                     
+  14                                           
+  15          //cmd_handle_array
+  16          code CMD_HANDLE_STRUCTURE Cmd_Handle_Array[] = {
+  17                  {0x01, vScuVerify},
+  18                  {0x02, vTbcVerify},
+  19                  {0x03, vLcdVerify},
+  20                  {0x04, vWdtVerify},
+  21                  {0x05, vRngVerify},
+  22                  {0x06, vAdcVerify},
+  23                  {0x07, vTimerVerify},
+  24                  {0x08, vIomVerify},
+  25                  {0x09, vOtpVerify},     
+*** ERROR C202 IN LINE 25 OF SRCFILE\LIB\CMDPROC.C: 'vOtpVerify': undefined identifier
+  26                  {0x10, vSm3Verify},
+  27                  {0xFF, vCmdErr}
+  28          };
+  29          
+  30          
+  31          void vCmdHandle(void)
+  32          {
+  33   1          unsigned int i=0;
+  34   1          unsigned char cmd_len;
+  35   1              DebugPrintf("vCmdHandle test!\r\n");
+  36   1          cmd_len = sizeof(Cmd_Handle_Array)/sizeof(Cmd_Handle_Array[0]);
+  37   1              g_UART_BUF_LEN=0;
+  38   1              while(1)
+  39   1              {
+  40   2                  
+  41   2                      while(1)
+  42   2                      {
+  43   3                          vUartRecvData(g_UART_COM_BUF,5);                    
+  44   3                              g_UART_RECEIVE_OK=0x55;
+  45   3                              break;
+  46   3                      } 
+  47   2                      //vUartRecvCmd();
+  48   2                                      
+  49   2                  if(0x55==g_UART_RECEIVE_OK)          
+  50   2                      {                   
+  51   3                              g_UART_RECEIVE_OK=0;
+C51 COMPILER V9.00   CMDPROC                                                               03/23/2015 16:32:24 PAGE 2   
+
+  52   3                              g_UART_BUF_LEN=0;
+  53   3                              for(i = 0; i < cmd_len; i++)
+  54   3                              {
+  55   4                              if( CMD_CLA == Cmd_Handle_Array[i].cmd)
+  56   4                              {
+  57   5                                              Cmd_Handle_Array[i].cmd_handle();
+  58   5                                              i = cmd_len;
+  59   5                              }
+  60   4                                      else if(i == (cmd_len - 1))     //no such cmd
+  61   4                                      {
+  62   5                                              Cmd_Handle_Array[i].cmd_handle();
+  63   5                                      }
+  64   4                                      
+  65   4                                      //g_UART_COM_BUF[0]=0;
+  66   4              
+  67   4                              }               
+  68   3                      }
+  69   2      
+  70   2              }
+  71   1      }
+  72          
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  1 ERROR(S)

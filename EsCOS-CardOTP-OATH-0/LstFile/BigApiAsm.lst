@@ -1,0 +1,88 @@
+A51 MACRO ASSEMBLER  BIGAPIASM                                                            11/23/2016 11:58:16 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02
+OBJECT MODULE PLACED IN .\ObjFile\BigApiAsm.obj
+ASSEMBLER INVOKED BY: C:\Keil\C51\BIN\A51.EXE SrcFile\Lib\BigApiAsm.a51 SET(LARGE) DEBUG PRINT(.\LstFile\BigApiAsm.lst) 
+                      OBJECT(.\ObjFile\BigApiAsm.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;$INCLUDE               (BigApiAsm.h)
+                       2     
+                       3     PUBLIC  _move_xdata_buffer
+                       4     PUBLIC  _clear_xdata_buffer
+                       5     
+  0086                 6     sfr     AUXR1           =               0x86;
+  0084                 7     sfr     DPL2            =               0x84;
+  0085                 8     sfr     DPH2            =               0x85;
+                       9     
+                      10     ?PR?_BigApiAsm          SEGMENT         CODE
+----                  11     RSEG                            ?PR?_BigApiAsm
+                      12     
+                      13     ; dst <--- src; 
+                      14     ; void move_xdata_buffer(char *dst, char *src, unsigned char len)
+                      15     ; dst(R6,R7), src(R4,R5),len(R3)
+                      16     ; NOTE: 1,len could be 0-255, 0 represents 256 bytes
+                      17     ;       2,dst,src must not be the same buffer because if it is, INC DPTR once per iteration
+                              is enough.
+0000                  18     _move_xdata_buffer: ;12 clk/byte
+0000 8C83             19             MOV     DPH, R4
+0002 8D82             20             MOV     DPL, R5
+0004 8E85             21         MOV DPH2, R6
+0006 8F84             22             MOV     DPL2, R7
+0008 BB0001           23             CJNE R3, #0,    move_xdata_buffer_1
+000B 22               24             ret
+000C                  25     move_xdata_buffer_1:        
+000C E0               26         MOVX A,@DPTR
+000D A3               27             INC DPTR
+000E 0586             28         INC AUXR1 
+0010 F0               29         MOVX @DPTR,A
+0011 A3               30             INC DPTR
+0012 0586             31         INC AUXR1
+0014 DBF6             32         DJNZ R3, move_xdata_buffer_1            
+0016 22               33         ret
+                      34     
+                      35     ; dst <--- 0; 
+                      36     ; void clear_xdata_buffer(char *buf, unsigned char len)
+                      37     ; buf(R6,R7), len(R5)
+                      38     ; NOTE: len could be 0-255, 0 represents 256 bytes
+0017                  39     _clear_xdata_buffer: ;12 clk/byte
+0017 8E83             40             MOV     DPH, R6
+0019 8F82             41             MOV     DPL, R7
+001B E4               42             CLR     A
+001C BD0001           43             CJNE R5, #0,    clear_xdata_buffer_1
+001F 22               44             ret
+0020                  45     clear_xdata_buffer_1:        
+0020 F0               46             MOVX    @DPTR,A
+0021 A3               47             INC     DPTR     
+0022 DDFC             48             DJNZ    R5, clear_xdata_buffer_1    
+0024 22               49             ret
+                      50     
+                      51     END
+                             
+                             
+A51 MACRO ASSEMBLER  BIGAPIASM                                                            11/23/2016 11:58:16 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E               T Y P E  V A L U E   ATTRIBUTES
+
+?PR?_BIGAPIASM . . .  C SEG    0025H       REL=UNIT
+AUXR1. . . . . . . .  D ADDR   0086H   A   
+CLEAR_XDATA_BUFFER_1  C ADDR   0020H   R   SEG=?PR?_BIGAPIASM
+DPH. . . . . . . . .  D ADDR   0083H   A   
+DPH2 . . . . . . . .  D ADDR   0085H   A   
+DPL. . . . . . . . .  D ADDR   0082H   A   
+DPL2 . . . . . . . .  D ADDR   0084H   A   
+MOVE_XDATA_BUFFER_1.  C ADDR   000CH   R   SEG=?PR?_BIGAPIASM
+_CLEAR_XDATA_BUFFER.  C ADDR   0017H   R   SEG=?PR?_BIGAPIASM
+_MOVE_XDATA_BUFFER .  C ADDR   0000H   R   SEG=?PR?_BIGAPIASM
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

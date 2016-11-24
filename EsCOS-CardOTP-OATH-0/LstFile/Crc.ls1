@@ -1,0 +1,522 @@
+A51 MACRO ASSEMBLER  CRC                                                                  11/23/2016 11:58:16 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02
+OBJECT MODULE PLACED IN .\ObjFile\Crc.OBJ
+ASSEMBLER INVOKED BY: C:\Keil\C51\BIN\A51.EXE .\ObjFile\Crc.src PR(.\LstFile\Crc.ls1) EP DEBUG
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ; .\ObjFile\Crc.SRC generated from: SrcFile\Lib\Crc.c
+                       2     ; COMPILER INVOKED BY:
+                       3     ;        C:\Keil\C51\BIN\C51.EXE SrcFile\Lib\Crc.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CP
+                             U;.\SrcFile\Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD
+                             _,_FPGA_DEMO_EN_) DEBUG OBJECTEXTEND PRINT(.\LstFile\Crc.lst) SRC(.\ObjFile\Crc.SRC)
+                       4     
+                       5     $nomod51 
+                       6     
+                       7     NAME    CRC
+                       8     
+  00F9                 9     SCULCDSWEN      DATA    0F9H
+  009E                10     SCUPC   DATA    09EH
+  00EF                11     RNGDATA DATA    0EFH
+  00D6                12     AC      BIT     0D0H.6
+  00AF                13     EA      BIT     0A8H.7
+  0092                14     SCUPM   DATA    092H
+  0090                15     SCUOSCCTRL      DATA    090H
+  00C2                16     IOMP0PU DATA    0C2H
+  00FA                17     SCURAMSWEN      DATA    0FAH
+  00CA                18     IOMP1PU DATA    0CAH
+  00A8                19     IE      DATA    0A8H
+  00ED                20     RNGMODE DATA    0EDH
+  00A0                21     KBCSTAT DATA    0A0H
+  0094                22     SCUSO   DATA    094H
+  0085                23     DPH2    DATA    085H
+  0084                24     DPL2    DATA    084H
+  009D                25     SCURNGC DATA    09DH
+  0095                26     SCUWT   DATA    095H
+  00AC                27     ES      BIT     0A8H.4
+  00B8                28     IP      DATA    0B8H
+  00D4                29     UARTBUF DATA    0D4H
+  00D7                30     CY      BIT     0D0H.7
+  00D5                31     UARTCON DATA    0D5H
+  00DE                32     TBCDR0  DATA    0DEH
+  00DD                33     TBCDR1  DATA    0DDH
+  00DC                34     TBCDR2  DATA    0DCH
+  009C                35     SCUCTRL DATA    09CH
+  00BC                36     PS      BIT     0B8H.4
+  0081                37     SP      DATA    081H
+  00DB                38     TBCDR3  DATA    0DBH
+  00C7                39     IOMP0DOUT       DATA    0C7H
+  00D2                40     OV      BIT     0D0H.2
+  00CF                41     IOMP1DOUT       DATA    0CFH
+  0098                42     SCUIE0  DATA    098H
+  0099                43     SCUIE1  DATA    099H
+  00B0                44     TM0CDATA        DATA    0B0H
+  0087                45     PCON    DATA    087H
+  00B1                46     TM1CDATA        DATA    0B1H
+  00A0                47     TM2CDATA        DATA    0A0H
+  00B3                48     TM0CON  DATA    0B3H
+  00A1                49     TM3CDATA        DATA    0A1H
+  00B4                50     TM1CON  DATA    0B4H
+  00B2                51     TM1MOD  DATA    0B2H
+  00F4                52     SM3CON  DATA    0F4H
+  00A3                53     TM2CON  DATA    0A3H
+  00A2                54     TM2MOD  DATA    0A2H
+  0088                55     TCON    DATA    088H
+  00A4                56     TM3CON  DATA    0A4H
+A51 MACRO ASSEMBLER  CRC                                                                  11/23/2016 11:58:16 PAGE     2
+
+  009A                57     SCUIS0  DATA    09AH
+  0096                58     SCUWE0  DATA    096H
+  009B                59     SCUIS1  DATA    09BH
+  0097                60     SCUWE1  DATA    097H
+  00B5                61     TM1INTSTS       DATA    0B5H
+  00A5                62     TM2INTSTS       DATA    0A5H
+  0089                63     IE0     BIT     088H.1
+  008B                64     IE1     BIT     088H.3
+  00F5                65     SM3INT  DATA    0F5H
+  00F0                66     B       DATA    0F0H
+  00DF                67     TBCINTSTS       DATA    0DFH
+  00C6                68     IOMP0DIN        DATA    0C6H
+  00CE                69     IOMP1DIN        DATA    0CEH
+  0091                70     SCUMCG  DATA    091H
+  00C1                71     IOMP0DIR        DATA    0C1H
+  00E0                72     ACC     DATA    0E0H
+  00C9                73     IOMP1DIR        DATA    0C9H
+  00A9                74     ET0     BIT     0A8H.1
+  00AB                75     ET1     BIT     0A8H.3
+  008D                76     TF0     BIT     088H.5
+  008F                77     TF1     BIT     088H.7
+  00A8                78     EX0     BIT     0A8H.0
+  0088                79     IT0     BIT     088H.0
+  00AA                80     EX1     BIT     0A8H.2
+  008A                81     IT1     BIT     088H.2
+  00D0                82     P       BIT     0D0H.0
+  00E5                83     WDTMOD  DATA    0E5H
+  00E4                84     WDTCON  DATA    0E4H
+  00EE                85     RNGINT  DATA    0EEH
+  00B9                86     PT0     BIT     0B8H.1
+  00D3                87     RS0     BIT     0D0H.3
+  00BB                88     PT1     BIT     0B8H.3
+  00C8                89     IOMP0ISR        DATA    0C8H
+  00D4                90     RS1     BIT     0D0H.4
+  00BC                91     IOMP1ISR        DATA    0BCH
+  00E6                92     WDTINTSTS       DATA    0E6H
+  00C4                93     IOMP0INTS1      DATA    0C4H
+  00B8                94     PX0     BIT     0B8H.0
+  00CC                95     IOMP1INTS1      DATA    0CCH
+  00C5                96     IOMP0INTS2      DATA    0C5H
+  00BA                97     PX1     BIT     0B8H.2
+  00CD                98     IOMP1INTS2      DATA    0CDH
+  0093                99     SCUPMP  DATA    093H
+  00A2               100     KBCDAT1 DATA    0A2H
+  0083               101     DPH     DATA    083H
+  00A3               102     KBCDAT2 DATA    0A3H
+  0082               103     DPL     DATA    082H
+  00A1               104     KBCCR   DATA    0A1H
+  0086               105     DPS     DATA    086H
+  00DA               106     TBCSTART        DATA    0DAH
+  00F8               107     SCUTMRCG        DATA    0F8H
+  00D9               108     TBCADJH DATA    0D9H
+  00D5               109     F0      BIT     0D0H.5
+  00D8               110     TBCADJL DATA    0D8H
+  00EC               111     RNGSTART        DATA    0ECH
+  00D0               112     PSW     DATA    0D0H
+  00C3               113     IOMP0PD DATA    0C3H
+  00C0               114     IOMCR   DATA    0C0H
+  00D6               115     UARTSTAT        DATA    0D6H
+  00CB               116     IOMP1PD DATA    0CBH
+                     117     ?PR?_u16CrcCompute?CRC                   SEGMENT CODE 
+                     118     ?XD?_u16CrcCompute?CRC                   SEGMENT XDATA OVERLAYABLE 
+                     119     ?PR?_ucEndianChange?CRC                  SEGMENT CODE 
+                     120             PUBLIC  _ucEndianChange
+                     121             PUBLIC  _u16CrcCompute
+                     122     
+A51 MACRO ASSEMBLER  CRC                                                                  11/23/2016 11:58:16 PAGE     3
+
+----                 123             RSEG  ?XD?_u16CrcCompute?CRC
+0000                 124     ?_u16CrcCompute?BYTE:
+0000                 125            addr?040:   DS   2
+0002                 126             ORG  2
+0002                 127             len?041:   DS   2
+0004                 128             ORG  4
+0004                 129             crc?042:   DS   2
+                     130     ; #define _CRC_C_
+                     131     ; #include "CRC.H"
+                     132     ; #include "OtpFunc.H"
+                     133     ; #include "DEBUG.H"
+                     134     ; 
+                     135     ; 
+                     136     ; 
+                     137     ; /********************************************************************
+                     138     ; Function name:      u16CrcCompute
+                     139     ; Input parameters:
+                     140     ;     addr, XBUS ADDRESS of the data;
+                     141     ;     len, the length of the data;
+                     142     ;     crc, crc initialization value;
+                     143     ; Return:
+                     144     ;     crc value;
+                     145     ; Function:
+                     146     ;     CRC value direct compute, poly given as defined;
+                     147     ; ********************************************************************/
+                     148     ; UINT16 u16CrcCompute(UINT16 addr, UINT16 len, UINT16 crc)
+                     149     
+----                 150             RSEG  ?PR?_u16CrcCompute?CRC
+0000                 151     _u16CrcCompute:
+                     152             USING   0
+                     153                             ; SOURCE LINE # 19
+0000 900000   F      154             MOV     DPTR,#addr?040
+0003 EE              155             MOV     A,R6
+0004 F0              156             MOVX    @DPTR,A
+0005 A3              157             INC     DPTR
+0006 EF              158             MOV     A,R7
+0007 F0              159             MOVX    @DPTR,A
+0008 A3              160             INC     DPTR
+0009 EC              161             MOV     A,R4
+000A F0              162             MOVX    @DPTR,A
+000B A3              163             INC     DPTR
+000C ED              164             MOV     A,R5
+000D F0              165             MOVX    @DPTR,A
+000E A3              166             INC     DPTR
+000F EA              167             MOV     A,R2
+0010 F0              168             MOVX    @DPTR,A
+0011 A3              169             INC     DPTR
+0012 EB              170             MOV     A,R3
+0013 F0              171             MOVX    @DPTR,A
+                     172     ; {
+                     173                             ; SOURCE LINE # 20
+                     174     ;     UINT16 i, j;
+                     175     ;     UINT8 uc;
+                     176     ;     for ( j = 0; j < len; j++)
+                     177                             ; SOURCE LINE # 23
+                     178     ;---- Variable 'j?044' assigned to Register 'R4/R5' ----
+0014 E4              179             CLR     A
+0015 FD              180             MOV     R5,A
+0016 FC              181             MOV     R4,A
+0017                 182     ?C0001:
+0017 D3              183             SETB    C
+0018 900000   F      184             MOV     DPTR,#len?041+01H
+001B E0              185             MOVX    A,@DPTR
+001C 9D              186             SUBB    A,R5
+001D 900000   F      187             MOV     DPTR,#len?041
+0020 E0              188             MOVX    A,@DPTR
+A51 MACRO ASSEMBLER  CRC                                                                  11/23/2016 11:58:16 PAGE     4
+
+0021 9C              189             SUBB    A,R4
+0022 405B            190             JC      ?C0002
+                     191     ;     {
+                     192                             ; SOURCE LINE # 24
+                     193     ;         uc = CBYTE[addr + j];         
+                     194                             ; SOURCE LINE # 25
+0024 900000   F      195             MOV     DPTR,#addr?040+01H
+0027 E0              196             MOVX    A,@DPTR
+0028 2D              197             ADD     A,R5
+0029 FF              198             MOV     R7,A
+002A 900000   F      199             MOV     DPTR,#addr?040
+002D E0              200             MOVX    A,@DPTR
+002E 3C              201             ADDC    A,R4
+002F 8F82            202             MOV     DPL,R7
+0031 F583            203             MOV     DPH,A
+0033 E4              204             CLR     A
+0034 93              205             MOVC    A,@A+DPTR
+                     206     ;---- Variable 'uc?045' assigned to Register 'R1' ----
+0035 F9              207             MOV     R1,A
+                     208     ;         for ( i = 0; i < 8; i++)
+                     209                             ; SOURCE LINE # 26
+                     210     ;---- Variable 'i?043' assigned to Register 'R2/R3' ----
+0036 E4              211             CLR     A
+0037 FB              212             MOV     R3,A
+0038 FA              213             MOV     R2,A
+0039                 214     ?C0004:
+                     215     ;         {
+                     216                             ; SOURCE LINE # 27
+                     217     ;             crc = ((uc ^ (UINT8)(crc >> 8)) & 0x80) ? ((crc << 1) ^ CRC_DFE_POLY) : (crc 
+                             << 1);
+                     218                             ; SOURCE LINE # 28
+0039 900000   F      219             MOV     DPTR,#crc?042
+003C E0              220             MOVX    A,@DPTR
+003D 69              221             XRL     A,R1
+003E 30E713          222             JNB     ACC.7,?C0007
+0041 A3              223             INC     DPTR
+0042 E0              224             MOVX    A,@DPTR
+0043 25E0            225             ADD     A,ACC
+0045 FF              226             MOV     R7,A
+0046 900000   F      227             MOV     DPTR,#crc?042
+0049 E0              228             MOVX    A,@DPTR
+004A 33              229             RLC     A
+004B 6480            230             XRL     A,#080H
+004D FE              231             MOV     R6,A
+004E EF              232             MOV     A,R7
+004F 6405            233             XRL     A,#05H
+0051 FF              234             MOV     R7,A
+0052 800D            235             SJMP    ?C0008
+0054                 236     ?C0007:
+0054 900000   F      237             MOV     DPTR,#crc?042+01H
+0057 E0              238             MOVX    A,@DPTR
+0058 25E0            239             ADD     A,ACC
+005A FF              240             MOV     R7,A
+005B 900000   F      241             MOV     DPTR,#crc?042
+005E E0              242             MOVX    A,@DPTR
+005F 33              243             RLC     A
+0060 FE              244             MOV     R6,A
+0061                 245     ?C0008:
+0061 900000   F      246             MOV     DPTR,#crc?042
+0064 EE              247             MOV     A,R6
+0065 F0              248             MOVX    @DPTR,A
+0066 A3              249             INC     DPTR
+0067 EF              250             MOV     A,R7
+0068 F0              251             MOVX    @DPTR,A
+                     252     ;             uc <<= 1;
+                     253                             ; SOURCE LINE # 29
+A51 MACRO ASSEMBLER  CRC                                                                  11/23/2016 11:58:16 PAGE     5
+
+0069 E9              254             MOV     A,R1
+006A 25E0            255             ADD     A,ACC
+006C F9              256             MOV     R1,A
+                     257     ;         }
+                     258                             ; SOURCE LINE # 30
+006D 0B              259             INC     R3
+006E BB0001          260             CJNE    R3,#00H,?C0011
+0071 0A              261             INC     R2
+0072                 262     ?C0011:
+0072 EB              263             MOV     A,R3
+0073 6408            264             XRL     A,#08H
+0075 4A              265             ORL     A,R2
+0076 70C1            266             JNZ     ?C0004
+                     267     ;     }
+                     268                             ; SOURCE LINE # 31
+0078                 269     ?C0003:
+0078 0D              270             INC     R5
+0079 BD0001          271             CJNE    R5,#00H,?C0012
+007C 0C              272             INC     R4
+007D                 273     ?C0012:
+007D 8098            274             SJMP    ?C0001
+007F                 275     ?C0002:
+                     276     ; 
+                     277     ;     return crc;
+                     278                             ; SOURCE LINE # 33
+007F 900000   F      279             MOV     DPTR,#crc?042
+0082 E0              280             MOVX    A,@DPTR
+0083 FE              281             MOV     R6,A
+0084 A3              282             INC     DPTR
+0085 E0              283             MOVX    A,@DPTR
+0086 FF              284             MOV     R7,A
+                     285     ; 
+                     286     ; }
+                     287                             ; SOURCE LINE # 35
+0087                 288     ?C0009:
+0087 22              289             RET     
+                     290     ; END OF _u16CrcCompute
+                     291     
+                     292     ; 
+                     293     ; /********************************************************************
+                     294     ; Function name:      ucEndianChange
+                     295     ; Input parameters:
+                     296     ;     inc, inchar;
+                     297     ; Return:
+                     298     ;     outc, endian change of inchar;
+                     299     ; Function:
+                     300     ;     endian change of the in BYTE;
+                     301     ; ********************************************************************/
+                     302     ; #pragma REGPARMS
+                     303     ; UINT8 ucEndianChange(UINT8 inchar)
+                     304     
+----                 305             RSEG  ?PR?_ucEndianChange?CRC
+0000                 306     _ucEndianChange:
+                     307             USING   0
+                     308                             ; SOURCE LINE # 47
+                     309     ;---- Variable 'inchar?146' assigned to Register 'R7' ----
+                     310     ; {
+                     311                             ; SOURCE LINE # 48
+                     312     ;     inchar = 0;
+                     313                             ; SOURCE LINE # 49
+                     314     ; #pragma asm
+                     315     ;     CLR A
+0000 E4              316               CLR A
+                     317     ;     MOV B, A
+0001 F5F0            318               MOV B, A
+                     319     ;     MOV R0, #08H
+A51 MACRO ASSEMBLER  CRC                                                                  11/23/2016 11:58:16 PAGE     6
+
+0003 7808            320               MOV R0, #08H
+                     321     ;     MOV A, R7
+0005 EF              322               MOV A, R7
+                     323     ;     CLR C
+0006 C3              324               CLR C
+                     325     ; ENDIANLOOP:
+0007                 326               ENDIANLOOP:
+                     327     ;     RLC A
+0007 33              328               RLC A
+                     329     ;     XCH A, B
+0008 C5F0            330               XCH A, B
+                     331     ;     RRC A
+000A 13              332               RRC A
+                     333     ;     XCH A, B
+000B C5F0            334               XCH A, B
+                     335     ;     DJNZ R0, ENDIANLOOP
+000D D8F8            336               DJNZ R0, ENDIANLOOP
+                     337     ; 
+                     338               
+                     339     ;     XCH A, B
+000F C5F0            340               XCH A, B
+                     341     ;     MOV R7, A
+0011 FF              342               MOV R7, A
+                     343     ; #pragma endasm
+                     344     ;     return ACC;
+                     345                             ; SOURCE LINE # 66
+0012 FF              346             MOV     R7,A
+                     347     ; }
+                     348                             ; SOURCE LINE # 67
+0013                 349     ?C0010:
+0013 22              350             RET     
+                     351     ; END OF _ucEndianChange
+                     352     
+                     353             END
+A51 MACRO ASSEMBLER  CRC                                                                  11/23/2016 11:58:16 PAGE     7
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E                  T Y P E  V A L U E   ATTRIBUTES
+
+?C0001. . . . . . . . .  C ADDR   0017H   R   SEG=?PR?_U16CRCCOMPUTE?CRC
+?C0002. . . . . . . . .  C ADDR   007FH   R   SEG=?PR?_U16CRCCOMPUTE?CRC
+?C0003. . . . . . . . .  C ADDR   0078H   R   SEG=?PR?_U16CRCCOMPUTE?CRC
+?C0004. . . . . . . . .  C ADDR   0039H   R   SEG=?PR?_U16CRCCOMPUTE?CRC
+?C0007. . . . . . . . .  C ADDR   0054H   R   SEG=?PR?_U16CRCCOMPUTE?CRC
+?C0008. . . . . . . . .  C ADDR   0061H   R   SEG=?PR?_U16CRCCOMPUTE?CRC
+?C0009. . . . . . . . .  C ADDR   0087H   R   SEG=?PR?_U16CRCCOMPUTE?CRC
+?C0010. . . . . . . . .  C ADDR   0013H   R   SEG=?PR?_UCENDIANCHANGE?CRC
+?C0011. . . . . . . . .  C ADDR   0072H   R   SEG=?PR?_U16CRCCOMPUTE?CRC
+?C0012. . . . . . . . .  C ADDR   007DH   R   SEG=?PR?_U16CRCCOMPUTE?CRC
+?PR?_U16CRCCOMPUTE?CRC.  C SEG    0088H       REL=UNIT
+?PR?_UCENDIANCHANGE?CRC  C SEG    0014H       REL=UNIT
+?XD?_U16CRCCOMPUTE?CRC.  X SEG    0006H       REL=UNIT
+?_U16CRCCOMPUTE?BYTE. .  X ADDR   0000H   R   SEG=?XD?_U16CRCCOMPUTE?CRC
+AC. . . . . . . . . . .  B ADDR   00D0H.6 A   
+ACC . . . . . . . . . .  D ADDR   00E0H   A   
+ADDR?040. . . . . . . .  X ADDR   0000H   R   SEG=?XD?_U16CRCCOMPUTE?CRC
+B . . . . . . . . . . .  D ADDR   00F0H   A   
+CRC . . . . . . . . . .  N NUMB   -----       
+CRC?042 . . . . . . . .  X ADDR   0004H   R   SEG=?XD?_U16CRCCOMPUTE?CRC
+CY. . . . . . . . . . .  B ADDR   00D0H.7 A   
+DPH . . . . . . . . . .  D ADDR   0083H   A   
+DPH2. . . . . . . . . .  D ADDR   0085H   A   
+DPL . . . . . . . . . .  D ADDR   0082H   A   
+DPL2. . . . . . . . . .  D ADDR   0084H   A   
+DPS . . . . . . . . . .  D ADDR   0086H   A   
+EA. . . . . . . . . . .  B ADDR   00A8H.7 A   
+ENDIANLOOP. . . . . . .  C ADDR   0007H   R   SEG=?PR?_UCENDIANCHANGE?CRC
+ES. . . . . . . . . . .  B ADDR   00A8H.4 A   
+ET0 . . . . . . . . . .  B ADDR   00A8H.1 A   
+ET1 . . . . . . . . . .  B ADDR   00A8H.3 A   
+EX0 . . . . . . . . . .  B ADDR   00A8H.0 A   
+EX1 . . . . . . . . . .  B ADDR   00A8H.2 A   
+F0. . . . . . . . . . .  B ADDR   00D0H.5 A   
+IE. . . . . . . . . . .  D ADDR   00A8H   A   
+IE0 . . . . . . . . . .  B ADDR   0088H.1 A   
+IE1 . . . . . . . . . .  B ADDR   0088H.3 A   
+IOMCR . . . . . . . . .  D ADDR   00C0H   A   
+IOMP0DIN. . . . . . . .  D ADDR   00C6H   A   
+IOMP0DIR. . . . . . . .  D ADDR   00C1H   A   
+IOMP0DOUT . . . . . . .  D ADDR   00C7H   A   
+IOMP0INTS1. . . . . . .  D ADDR   00C4H   A   
+IOMP0INTS2. . . . . . .  D ADDR   00C5H   A   
+IOMP0ISR. . . . . . . .  D ADDR   00C8H   A   
+IOMP0PD . . . . . . . .  D ADDR   00C3H   A   
+IOMP0PU . . . . . . . .  D ADDR   00C2H   A   
+IOMP1DIN. . . . . . . .  D ADDR   00CEH   A   
+IOMP1DIR. . . . . . . .  D ADDR   00C9H   A   
+IOMP1DOUT . . . . . . .  D ADDR   00CFH   A   
+IOMP1INTS1. . . . . . .  D ADDR   00CCH   A   
+IOMP1INTS2. . . . . . .  D ADDR   00CDH   A   
+IOMP1ISR. . . . . . . .  D ADDR   00BCH   A   
+IOMP1PD . . . . . . . .  D ADDR   00CBH   A   
+IOMP1PU . . . . . . . .  D ADDR   00CAH   A   
+IP. . . . . . . . . . .  D ADDR   00B8H   A   
+IT0 . . . . . . . . . .  B ADDR   0088H.0 A   
+IT1 . . . . . . . . . .  B ADDR   0088H.2 A   
+KBCCR . . . . . . . . .  D ADDR   00A1H   A   
+KBCDAT1 . . . . . . . .  D ADDR   00A2H   A   
+KBCDAT2 . . . . . . . .  D ADDR   00A3H   A   
+A51 MACRO ASSEMBLER  CRC                                                                  11/23/2016 11:58:16 PAGE     8
+
+KBCSTAT . . . . . . . .  D ADDR   00A0H   A   
+LEN?041 . . . . . . . .  X ADDR   0002H   R   SEG=?XD?_U16CRCCOMPUTE?CRC
+OV. . . . . . . . . . .  B ADDR   00D0H.2 A   
+P . . . . . . . . . . .  B ADDR   00D0H.0 A   
+PCON. . . . . . . . . .  D ADDR   0087H   A   
+PS. . . . . . . . . . .  B ADDR   00B8H.4 A   
+PSW . . . . . . . . . .  D ADDR   00D0H   A   
+PT0 . . . . . . . . . .  B ADDR   00B8H.1 A   
+PT1 . . . . . . . . . .  B ADDR   00B8H.3 A   
+PX0 . . . . . . . . . .  B ADDR   00B8H.0 A   
+PX1 . . . . . . . . . .  B ADDR   00B8H.2 A   
+RNGDATA . . . . . . . .  D ADDR   00EFH   A   
+RNGINT. . . . . . . . .  D ADDR   00EEH   A   
+RNGMODE . . . . . . . .  D ADDR   00EDH   A   
+RNGSTART. . . . . . . .  D ADDR   00ECH   A   
+RS0 . . . . . . . . . .  B ADDR   00D0H.3 A   
+RS1 . . . . . . . . . .  B ADDR   00D0H.4 A   
+SCUCTRL . . . . . . . .  D ADDR   009CH   A   
+SCUIE0. . . . . . . . .  D ADDR   0098H   A   
+SCUIE1. . . . . . . . .  D ADDR   0099H   A   
+SCUIS0. . . . . . . . .  D ADDR   009AH   A   
+SCUIS1. . . . . . . . .  D ADDR   009BH   A   
+SCULCDSWEN. . . . . . .  D ADDR   00F9H   A   
+SCUMCG. . . . . . . . .  D ADDR   0091H   A   
+SCUOSCCTRL. . . . . . .  D ADDR   0090H   A   
+SCUPC . . . . . . . . .  D ADDR   009EH   A   
+SCUPM . . . . . . . . .  D ADDR   0092H   A   
+SCUPMP. . . . . . . . .  D ADDR   0093H   A   
+SCURAMSWEN. . . . . . .  D ADDR   00FAH   A   
+SCURNGC . . . . . . . .  D ADDR   009DH   A   
+SCUSO . . . . . . . . .  D ADDR   0094H   A   
+SCUTMRCG. . . . . . . .  D ADDR   00F8H   A   
+SCUWE0. . . . . . . . .  D ADDR   0096H   A   
+SCUWE1. . . . . . . . .  D ADDR   0097H   A   
+SCUWT . . . . . . . . .  D ADDR   0095H   A   
+SM3CON. . . . . . . . .  D ADDR   00F4H   A   
+SM3INT. . . . . . . . .  D ADDR   00F5H   A   
+SP. . . . . . . . . . .  D ADDR   0081H   A   
+TBCADJH . . . . . . . .  D ADDR   00D9H   A   
+TBCADJL . . . . . . . .  D ADDR   00D8H   A   
+TBCDR0. . . . . . . . .  D ADDR   00DEH   A   
+TBCDR1. . . . . . . . .  D ADDR   00DDH   A   
+TBCDR2. . . . . . . . .  D ADDR   00DCH   A   
+TBCDR3. . . . . . . . .  D ADDR   00DBH   A   
+TBCINTSTS . . . . . . .  D ADDR   00DFH   A   
+TBCSTART. . . . . . . .  D ADDR   00DAH   A   
+TCON. . . . . . . . . .  D ADDR   0088H   A   
+TF0 . . . . . . . . . .  B ADDR   0088H.5 A   
+TF1 . . . . . . . . . .  B ADDR   0088H.7 A   
+TM0CDATA. . . . . . . .  D ADDR   00B0H   A   
+TM0CON. . . . . . . . .  D ADDR   00B3H   A   
+TM1CDATA. . . . . . . .  D ADDR   00B1H   A   
+TM1CON. . . . . . . . .  D ADDR   00B4H   A   
+TM1INTSTS . . . . . . .  D ADDR   00B5H   A   
+TM1MOD. . . . . . . . .  D ADDR   00B2H   A   
+TM2CDATA. . . . . . . .  D ADDR   00A0H   A   
+TM2CON. . . . . . . . .  D ADDR   00A3H   A   
+TM2INTSTS . . . . . . .  D ADDR   00A5H   A   
+TM2MOD. . . . . . . . .  D ADDR   00A2H   A   
+TM3CDATA. . . . . . . .  D ADDR   00A1H   A   
+TM3CON. . . . . . . . .  D ADDR   00A4H   A   
+UARTBUF . . . . . . . .  D ADDR   00D4H   A   
+UARTCON . . . . . . . .  D ADDR   00D5H   A   
+UARTSTAT. . . . . . . .  D ADDR   00D6H   A   
+WDTCON. . . . . . . . .  D ADDR   00E4H   A   
+WDTINTSTS . . . . . . .  D ADDR   00E6H   A   
+A51 MACRO ASSEMBLER  CRC                                                                  11/23/2016 11:58:16 PAGE     9
+
+WDTMOD. . . . . . . . .  D ADDR   00E5H   A   
+_U16CRCCOMPUTE. . . . .  C ADDR   0000H   R   SEG=?PR?_U16CRCCOMPUTE?CRC
+_UCENDIANCHANGE . . . .  C ADDR   0000H   R   SEG=?PR?_UCENDIANCHANGE?CRC
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

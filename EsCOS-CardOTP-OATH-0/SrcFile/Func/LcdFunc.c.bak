@@ -1,0 +1,515 @@
+/********************************************************************
+                          Nationz Co.,Ltd
+        Copyright (c) 2009－2015 All Rights Reserved
+ ********************************************************************
+File: LcdFunc.c
+History：
+Version                      Author                     Date
+V0.1                         nationz              2013-03-27
+
+Description:
+     LcdFunc Source Code File;
+Function list:
+     void vLcdInit(UINT8 BIAS,UINT8 DUTY,UINT8 FRM)；
+	 void vLcd_Set_All(void)；
+	 void vLcd_Clear_All(void)；
+	 void vLcd_Bcd_Shift(UINT8 index)；
+	 void vLcd_Bcd_Clear(UINT8 index)；
+	 void vLcd_Bcd_Display(UINT8 index,UINT8 BCD)；
+	 void vLcd_String_Display(UINT8 cString[],UINT8 cLen)；
+	 void vLcd_Flag_Display(UINT8 index,UINT8 bOpen)；
+	 void vLcd_Flag_Clear(void)；        
+Special statement:
+     NULL
+ *******************************************************************/
+#define _LCDFUNC_C_
+#include "LCDFRAME.H"
+#include "SCUFUNC.H" 
+#include "intrins.H"
+#include "stdio.H"
+/********************************************************************
+Function name:       vLcdInit
+Input parameters:
+    UINT8 BIAS：Lcd Bias Volage Set 
+	UINT8 DUTY：Lcd Duty Cycles Set
+	UINT8 FRM：	Lcd Scan Freq Set
+Return:
+    void
+Function:
+    Enable LCD Module.
+********************************************************************/
+void vDelay1ms(UINT8 Count)
+{
+	 while(Count--)
+	 {
+	 	 _nop_();
+		 _nop_();
+		 _nop_();
+		 _nop_();
+	 }
+
+}
+#ifndef _DEV_BOARD_ 
+void vLcdInit(UINT8 BIAS,UINT8 DUTY,UINT8 FRM)
+{   
+    vScu_AnactrlClkEn();
+
+	LCDCR&=0x81;
+	LCDCR|=BIAS;
+	LCDCR|=DUTY;
+	LCDCR|=FRM;		
+
+	vLcd_BiasOn();
+	//Delay 10ms
+	//LCDCR=0x59;//for test
+	vDelay1ms(10);
+
+
+	//vLcd_SetDisplayMode();
+	//LCDDSPMOD=0x02;
+
+}
+#else
+void vLcdInit(UINT8 BIAS,UINT8 DUTY,UINT8 FRM)
+{   
+    vScu_AnactrlClkEn();
+
+	LCDCR&=0x81;
+	LCDCR|=BIAS;
+	LCDCR|=DUTY;
+	LCDCR|=FRM;		
+
+	vLcd_BiasOn();	
+	vDelay1ms(10);
+
+
+	vLcd_SetDisplayMode();
+	
+
+}
+#endif
+
+/********************************************************************
+Function name:       vLcd_Set_All
+Input parameters:
+    void
+Return:
+    void
+Function:
+    Light On all dots of Lcd Panel.
+********************************************************************/
+#if	0	//ndef _DEV_BOARD_ 
+void vLcd_Set_All(void)
+{
+	UINT8 xdata i=0x22,*pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x1412;
+	while(i--)
+	{
+		*pLcdDispReg++=0x1f;
+		//*pLcdDispReg++=0xff;
+	}
+}
+//#else
+void vLcd_Set_All(void)
+{
+	UINT8 xdata i=0x1E,*pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x1416;//SEG4
+	while(i--)
+	{
+		*pLcdDispReg++=0x1f;		
+	}
+}
+#endif
+/********************************************************************
+Function name:       vLcd_Clear_All
+Input parameters:
+    void
+Return:
+    void
+Function:
+    Shut Off all dots of Lcd Panel.
+********************************************************************/
+#ifndef _DEV_BOARD_ 
+void vLcd_Clear_All(void)
+{
+	UINT8 xdata i=0x22,*pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x1415;
+	while(i--)
+	{
+		*pLcdDispReg++=0x00;
+	}
+}
+//void vLcd_Clear_All_Character(void)
+void vLcd_String_Clear(void)			//ok
+{
+	UINT8 xdata i=0x22,*pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x1419;		//	0x141a	//我司屏0x1419			//test0526
+	while(i--)
+	{
+		*pLcdDispReg++=0x00;
+	}
+}
+#else
+void vLcd_Clear_All(void)
+{
+	UINT8 xdata i=0x1E,*pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x1415;
+	while(i--)
+	{
+		*pLcdDispReg++=0x00;
+	}
+}
+//void vLcd_Clear_All_Character(void)
+void vLcd_String_Clear(void)		//ok
+{
+	UINT8 xdata i=0x1a,*pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x1419;			//0x141a		//我司屏0x1419			//test0526	
+	while(i--)
+	{
+		*pLcdDispReg++=0x00;
+	}
+}
+#endif
+
+/********************************************************************
+Function name:       vLcd_Bcd_Shift
+Input parameters:
+    UINT8 index：Specifies the Cursor Position Index
+Return:
+    void
+Function:
+    Specifies the Cursor Position Flashing.
+********************************************************************/
+#if	0			//ndef _DEV_BOARD_ 
+void vLcd_Bcd_Shift(UINT8 index)
+{
+	UINT8 xdata *pLcdDispReg;	
+	pLcdDispReg = (unsigned char xdata*)0x1432; 	
+	if(index<14)
+	{
+		*(pLcdDispReg - index*2-1) ^= 0x00;		
+	}
+}
+//#else
+void vLcd_Bcd_Shift(UINT8 index)
+{
+	UINT8 xdata *pLcdDispReg;	
+	pLcdDispReg = (unsigned char xdata*)0x1432; 	
+	if(index<14)
+	{
+		*(pLcdDispReg - index*2-1) ^= 0x00;		
+	}
+}
+#endif
+/********************************************************************
+Function name:       vLcd_Bcd_Clear
+Input parameters:
+    UINT8 index：Specifies the Cursor Position Index
+Return:
+    void
+Function:
+    Specifies the Cursor Position Stop Flashing.
+********************************************************************/
+#ifndef _DEV_BOARD_
+void vLcd_Bcd_Clear(UINT8 index)
+{
+	UINT8 xdata *pLcdDispReg;	 		
+	pLcdDispReg = (unsigned char xdata*)0x142F;			//从右到左显示 	0x1432	//我司屏从0x142F			//test0526
+	if(index<14)
+	{
+		*(pLcdDispReg - index*2+1) = 0;			
+		*(pLcdDispReg - index*2) = 0;		
+	}
+}
+#else
+void vLcd_Bcd_Clear(UINT8 index)
+{
+	UINT8 xdata *pLcdDispReg;	 		
+	pLcdDispReg = (unsigned char xdata*)0x142F;			//从右到左显示 	0x1432	//我司屏从0x142F			//test0526
+	if(index<14)
+	if(index<14)
+	{
+		*(pLcdDispReg - index*2+1) = 0;			
+		*(pLcdDispReg - index*2) = 0;		
+	}
+}
+#endif
+/********************************************************************
+Function name:       vLcd_Bcd_Display
+Input parameters:
+    UINT8 index：Specifies the Display Cursor Position Index
+	UINT8 BCD：Index Content to  Dispaly(must be Binary-Coded Decimal)
+Return:
+    void
+Function:
+    Display the Specifies Content.
+********************************************************************/
+#ifdef _RIGHT_DISP_
+
+void vLcd_Bcd_Display1(UINT8 index,UINT8 BCD, UINT8 flag)			//是这个		ok
+{
+	UINT8 xdata *pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x142F; //从右到左显示 	0x1432	//我司屏从0x142F		//test0526
+	//vScu_SetSysClkOsc2M();
+
+	if(flag == 0)
+	{
+		if(index<14)
+		{
+			*(pLcdDispReg-index*2+1) = Num[BCD][1];		
+			*(pLcdDispReg - index*2) = (Num[BCD][0]);
+			
+		}
+	}
+	else
+	{
+		if(index<14)
+		{
+			*(pLcdDispReg-index*2+1) = Num[BCD][1]|0x08;		
+			*(pLcdDispReg - index*2) = (Num[BCD][0]);			//小数点
+			
+		}
+	}
+	//vScu_SetSysClk32K();
+}
+
+#if	0			//ndef _DEV_BOARD_
+void vLcd_Bcd_Display(UINT8 index,UINT8 BCD)
+{
+	UINT8 xdata *pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x1432; //从右到左显示 	
+	if(index<14)
+	{	    
+		  *(pLcdDispReg-index*2+1) = Num[BCD][1];		
+		  *(pLcdDispReg - index*2) = (Num[BCD][0]); 		
+		
+	}
+}
+
+void vLcd_Point_Display(UINT8 index)
+{
+	UINT8 xdata *pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x1432; //从右到左显示 	
+	if(index<14)
+	{	    
+		  *(pLcdDispReg-index*2+1) |= 0x08;		   		
+		
+	}
+}
+
+//#else
+void vLcd_Bcd_Display(UINT8 index,UINT8 BCD)
+{
+	UINT8 xdata *pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x1432; //从右到左显示 	
+	if(index<14)
+	{
+		*(pLcdDispReg-index*2+1) = Num[BCD][1];		
+		*(pLcdDispReg - index*2) = (Num[BCD][0]);
+		
+	}
+}
+#endif
+
+//#else
+
+#if	0				//ndef _DEV_BOARD_
+void vLcd_Bcd_Display(UINT8 index,UINT8 BCD)
+{
+	UINT8 xdata *pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x141a; //从左到右显示 	
+	if(index<14)
+	{
+		*(pLcdDispReg+index*2) = Num[BCD][0];		
+		*(pLcdDispReg+index*2+1) = (Num[BCD][1]);
+		
+	}
+}
+//#else
+void vLcd_Bcd_Display(UINT8 index,UINT8 BCD)
+{
+	UINT8 xdata *pLcdDispReg;
+	pLcdDispReg=(UINT8 xdata *)0x141a; //从左到右显示 	
+	if(index<14)
+	{
+		*(pLcdDispReg+index*2) = Num[BCD][0];		
+		*(pLcdDispReg+index*2+1) = (Num[BCD][1]);
+		
+	}
+}
+#endif
+
+#endif
+/********************************************************************
+Function name:       vLcd_String_Display
+Input parameters:
+    UINT8 cString[]：The Addr of Display Content
+	UINT8 cLen：The Length of cString
+Return:
+    void
+Function:
+    Display the cString Content.
+********************************************************************/
+#if 0
+void vLcd_String_Display(UINT8 cString[],UINT8 cLen)
+{
+	UINT8 i,j,k=0;
+	//为演示效果切换时钟
+	vScu_SetSysClkOsc500K();
+
+	for(i=0;i<cLen;i++)
+	{
+		for(j=0;j<27;j++)		
+		{
+			if(cString[i] ==  Num_Assic[j])
+			{						    
+				vLcd_Bcd_Display((cLen-i-1),j);
+				
+				continue;
+			}
+		}
+	}
+	//切回32K
+	vScu_SetSysClk32K();
+}
+#endif
+
+void vLcd_String_Display(UINT8 cString[],UINT8 cLen)			//ok
+{
+	UINT8 i,j;
+	UINT8 Temp;
+	//为演示效果切换时钟
+	//vScu_SetSysClkOsc500K();
+	vScu_SetSysClkOsc2M();				//这个会不会影响
+
+	for(i=0;i<cLen;i++)
+	{
+		for(j=0;j<27;j++)			//text26	
+		{
+			if(cString[i]&0x80) 				//有小数点
+			{
+				Temp = cString[i]&0x7f;			//还原
+				if(Temp ==  Num_Assic[j])
+				{
+					vLcd_Bcd_Display1((cLen-i-1),j,1);
+					continue;
+				}
+			}
+			else
+			{
+				if(cString[i] ==  Num_Assic[j])
+				{
+					vLcd_Bcd_Display1((cLen-i-1),j, 0);
+					continue;
+				}
+			}
+		}
+	}
+	//切回32K
+	vScu_SetSysClk32K();
+}
+/********************************************************************
+Function name:       vLcd_Flag_Display
+Input parameters:
+    UINT8 index：Specifies the Display Flag Index
+	UINT8 bOpen：1：Display  On the Specifies Flag 
+	             0：Display  Off the Specifies Flag
+Return:
+    void
+Function:
+    Display the Specifies Flag.
+********************************************************************/
+#ifndef _DEV_BOARD_
+void vLcd_Flag_Display(UINT8 index,UINT8 bOpen)			//ok
+{
+	UINT8 xdata *pLcdDispReg;
+	pLcdDispReg = (UINT8 xdata *)0x1415;	//0x1418			//我司屏0x1415		//test0526
+	
+	if(index<16)
+	{
+		if(bOpen==0)//清除显示
+		{
+			*(pLcdDispReg+(Flag[index][0])) &= (~Flag[index][1]);
+		}
+		else
+		{
+			*(pLcdDispReg+(Flag[index][0])) |= Flag[index][1];
+		}
+	}
+}
+#if 0
+void vLcd_Flag_Display_ForIsr(UINT8 index,UINT8 bOpen)
+{
+	UINT8 xdata *pLcdDispReg;
+	pLcdDispReg = (UINT8 xdata *)0x1415;
+	
+	if(index<16)
+	{
+		if(bOpen==0)//清除显示
+		{
+			*(pLcdDispReg+(Flag[index][0])) &= (~Flag[index][1]);
+		}
+		else
+		{
+			*(pLcdDispReg+(Flag[index][0])) |= Flag[index][1];
+		}
+	}
+}
+#endif
+#else
+void vLcd_Flag_Display(UINT8 index,UINT8 bOpen)		//ok
+{
+	UINT8 xdata *pLcdDispReg;
+	pLcdDispReg = (UINT8 xdata *)0x1418;				//我司屏0x1415
+	
+	if(index<16)
+	{
+		if(bOpen==0)//清除显示
+		{
+			*(pLcdDispReg+Flag[index][0]) &= (~Flag[index][1]);
+		}
+		else
+		{
+			*(pLcdDispReg+Flag[index][0]) |= Flag[index][1];
+		}
+	}
+}
+#if 0
+void vLcd_Flag_Display_ForIsr(UINT8 index,UINT8 bOpen)
+{
+	UINT8 xdata *pLcdDispReg;
+	pLcdDispReg = (UINT8 xdata *)0x1415;
+	
+	if(index<16)
+	{
+		if(bOpen==0)//清除显示
+		{
+			*(pLcdDispReg+(Flag[index][0])) &= (~Flag[index][1]);
+		}
+		else
+		{
+			*(pLcdDispReg+(Flag[index][0])) |= Flag[index][1];
+		}
+	}
+}
+#endif
+#endif
+/********************************************************************
+Function name:       vLcd_Flag_Clear
+Input parameters:
+    void
+Return:
+    void
+Function:
+    Display Off All Flag.
+********************************************************************/ 
+#if 1
+void vLcd_Flag_Clear(void)		//ok
+{	UINT8 i;
+	for(i=0;i<16;i++)
+	{
+		vLcd_Flag_Display(i,0);
+	}
+}
+#endif
+

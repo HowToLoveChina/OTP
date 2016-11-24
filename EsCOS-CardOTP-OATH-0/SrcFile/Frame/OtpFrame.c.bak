@@ -1,0 +1,3097 @@
+/********************************************************************
+                          Nationz Co.,Ltd
+        Copyright (c) 2009－2015 All Rights Reserved
+ ********************************************************************
+File: OtpFrame.c
+History：
+Version                      Author                     Date
+V0.1                         nationz              2013-03-27
+
+Description:
+     OtpFrame Source Code File;
+Function list:
+        void vOTP_RunModeProcess(void);
+		void vOTP_UnlockPinProcess(void);
+		void vOTP_SetPinProcess(void);
+		void vOTP_InputPinProcess(void);
+		void vOTP_ActiveProcess(void);
+		void vOTP_SeedImportProcess(void);
+		void vOTP_ScrapProcess(void);        
+Special statement:
+     NULL
+ *******************************************************************/
+#define _OTPFRAME_C_
+#include "OTPFRAME.H"
+#include "LCDFUNC.H"
+#include "SCUFUNC.H"
+//#include "KBCFRAME.H"
+#include "UartFrame.h"
+#include "TBCFUNC.H"
+#include "ADCFUNC.H" 
+#include "string.H"	
+#include "UartFunc.h"
+#include "Debug.h" 
+#include "SM3FUNC.H"
+#include "TBCFRAME.H"
+#include "SM4.h"
+#include "OtpFunc.h"
+#include "Iomfunc.h"
+
+//UINT8 bOpenHash,bCloseLCD,bAlwaysbdisplay;
+UINT8 DispKeyPad[SCREENLEN];
+
+UINT8 u1Time_Dispaly[6];
+
+//UINT8  g_UART_COM_BUF[64];
+UINT8 idata g_ModfyPwFlag _at_ 0x38;
+u1 LongPressFlag = 0; 
+UINT8 g_AutoUnlockFlag = 0;
+UINT8 idata g_AutoUnlockCnt _at_ 0x37;
+UINT8 idata gUnlockPinErr_Count _at_ 0x36;//手动解锁计数，超过一定次数，OTP失效或自毁
+UINT8 idata gsuperpw _at_ 0x30;            //激活标志位
+UINT8 idata gUseCase _at_ 0x31;           //OTP 状态切换标志
+UINT32 idata gTimer_Count_Base _at_ 0x32; //	OTP系统基准偏移时间
+//UINT32 idata gTimer_Count _at_ 0x36; //	OTP系统时间
+UINT32 idata gPinErr_Time _at_ 0x3A; // OTP被锁定的系统时间
+UINT8 idata gPinErr_Count _at_ 0x3E;      //Pin码输入错误计数，最大错误次数不超过6次
+UINT8 idata gCalibflag _at_ 0x3F;
+//UINT8 idata PowerOnFlag _at_ 0xb0; 		//STARTUP文件里面的变量，改善复位后RAM被清掉的情况
+u1 u1LowPowerFlag = 0;
+
+volatile UINT8 gSecCount_10S,gFlag_1S; //指示关机等待时间计数器，每10S显示标志关闭一个，时间标志全部消失OTP自动关机
+
+
+UINT8 idata gUserInfo[32] _at_ 0x40;      //种子密钥等用户信息，掉电保持
+//UINT8 idata gActiveSeed[32]; 
+//UINT8 idata gUnlockSeed[32];
+UINT8 idata gPin_Save[PW_SM_LEN] _at_ 0x60;//OTP 开机PIN码，掉电保持
+//UINT8 gPin_Key[8];
+//UINT8 gErr[8]={"Error-00"};
+
+UINT8 idata g_u1SeedKey[SEEDKEY_LEN] _at_ 0x70;		//seedkey
+UINT8 idata g_u1MacKey[MACKEY_LEN] _at_ 0x80;		//MACkey
+//UINT8 xdata g_u1Key[KEY_LEN] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};              //u1KEY
+UINT8 idata g_u1Key[KEY_LEN] _at_ 0x90;              //u1KEY
+//UINT8 xdata g_u1SN[SN_LEN] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};              //序列号
+UINT8 idata g_u1SN[SN_LEN] _at_ 0xa0;              //序列号
+
+/********************************************************************
+Function name:       void vOTP_KEY_CHECK(void)
+Input parameters:
+    void  
+Return:
+    void
+Function:
+    Input Pin Code Process when OTP(been Actived) Power On  	
+********************************************************************/
+//输入PIN 操作
+u4 GetBaseTime(UINT8 *TimeInput)
+{
+	u4	Ticks;
+	u2	k;
+	u2  u2Tmp;
+	
+	Ticks	=BASE_2011MINUTES; //BASE_MINUTES_2011;
+
+	//u2Tmp = *(TimeInput + 1)*100 + *(TimeInput + 2);
+	k	=2011;
+	while( k<(2000 + *(TimeInput + 2) )	)
+	{
+		Ticks	+= 525600ul;  //365*24*60
+		if((k&0x03)==0)
+		{
+			Ticks	+=1440ul; //24*60
+		}
+		k++;
+	}
+	
+	if(*(TimeInput + 3)>1)
+	{
+		Ticks	+=44640ul;    //31*24*60
+	}
+
+	if(*(TimeInput + 3)>2)
+	{
+		if(((*(TimeInput + 2))&0x03)==0)
+		{
+			Ticks	+=41760ul; //29*24*60
+		}
+		else
+		{
+			Ticks	+=40320ul; //28*24*60
+		}
+	}
+
+	if(*(TimeInput + 3)>3)
+	{
+		Ticks	+=44640ul;
+	}	
+
+	if(*(TimeInput + 3)>4)
+	{
+		Ticks	+=43200ul;  //30*24*60
+	}	
+
+	if(*(TimeInput + 3)>5)
+	{
+		Ticks	+=44640ul;
+	}	
+
+	if(*(TimeInput + 3)>6)
+	{
+		Ticks	+=43200ul;
+	}	
+
+	if(*(TimeInput + 3)>7)
+	{
+		Ticks	+=44640ul;
+	}	
+
+	if(*(TimeInput + 3)>8)
+	{
+		Ticks	+=44640ul;
+	}	
+
+	if(*(TimeInput + 3)>9)
+	{
+		Ticks	+=43200ul;
+	}	
+
+	if(*(TimeInput + 3)>10)
+	{
+		Ticks	+=44640ul;
+	}	
+
+	if(*(TimeInput + 3)>11)
+	{
+		Ticks	+=43200ul;
+	}
+
+	u2Tmp    = (u2)(*(TimeInput + 4)-1)*(1440);//24*60;
+	Ticks	+= u2Tmp;//(RTC_DateStruct.RTC_Date-1)*(24*60);//24*60
+	u2Tmp   = *(TimeInput + 5)*60;
+	Ticks	+= u2Tmp;//RTC_TimeStruct.RTC_Hours*60;
+	Ticks	+= *(TimeInput + 6);
+	Ticks   *= 60;
+	Ticks	+= *(TimeInput + 7);
+	//Ticks	=1206446790;  // 单位为秒，即“3 25 2008, 12:06:30 GMT”
+	//*pdata =Ticks;
+	return Ticks;
+}
+
+UINT8 DectoBCD( UINT8 temp )  
+{  
+	return ( (temp/10)*16 + temp%10 ) ;  
+} 
+
+void HexToStr(UINT8 *pbDest, UINT8 *pbSrc, UINT8 nLen)
+{
+	char	ddl,ddh;
+	UINT8   i;
+	
+	for (i=0; i<nLen; i++)
+	{
+		ddh = 48 + pbSrc[i] / 16;
+		ddl = 48 + pbSrc[i] % 16;
+		if (ddh > 57) ddh = ddh + 7;
+		if (ddl > 57) ddl = ddl + 7;
+		pbDest[i*2] = ddh;
+		pbDest[i*2+1] = ddl;
+	}
+	
+	pbDest[nLen*2] = '\0';
+}
+
+UINT8 Get2121Chk2(const UINT8* pu1Num, UINT32 u4NumLen)
+{
+	UINT8	u1Temp;
+	UINT32	u4Data;
+	UINT32	i;
+	
+	u4Data = 0;
+	for ( i = 0; i < u4NumLen; i++)
+	{
+		u1Temp = (UINT8)((pu1Num[i] - 0x30)*(0x02 - (i&0x01)));
+		u4Data += /*(u1Temp/10) + */(u1Temp%10);
+	}
+	u1Temp = (UINT8)(10 - (u4Data%10));
+	if ( 10 == u1Temp )
+	{
+		u1Temp = 0x00;
+	}
+	return u1Temp;
+}
+
+void vOTP_KEY_CALIB(void)
+{
+	u2 u2Status; 
+	UINT8 Crystal_Symbol;
+	float Crystal_Tmp;
+
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();			
+#endif
+    vLcd_Flag_Clear();
+	vLcd_String_Clear();
+	vLcd_String_Display("P1kkkkkkkkkk",12);
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+
+	if(u1LowPowerFlag == 1)
+	{
+		vLcd_Flag_Display(10,1);//低电池电量标志
+	}
+	vUartInit();
+	vIom_LsclkOutEn();
+
+	while(1)
+	{
+		u2Status = ReceiveData_Poll();
+
+		if(u2Status == RSP_SET_SUCCESS)
+		{
+			if(OPCODE_SET_CALIB== g_UART_COM_BUF[OFFSET_OP])
+			{
+                Crystal_Symbol = g_UART_COM_BUF[OFFSET_DATA];
+                Crystal_Tmp = (float)g_UART_COM_BUF[OFFSET_DATA+1];
+                Bak_PPMValue = ((u2)g_UART_COM_BUF[OFFSET_DATA]<<8) + (u2)g_UART_COM_BUF[OFFSET_DATA+1];
+                
+                if(0x80&Crystal_Symbol) //-ppm
+                {
+                    Crystal_PPM = -Crystal_Tmp/2;
+                }
+                else
+                {
+                    Crystal_PPM = Crystal_Tmp/2;
+                }
+
+				if(Bak_PPMValue&0x8000) //在TBC启动之前需要配置
+				{
+                    TBCADJL=(UINT8)((0x7FFF-(Bak_PPMValue&0x7FFF))); 
+					TBCADJH=(UINT8)((0x7FFF-(Bak_PPMValue&0x7FFF))>>8);		    			
+				}
+				else
+				{
+                    TBCADJL=(UINT8)((0x7FFF+Bak_PPMValue));
+			 		TBCADJH=(UINT8)((0x7FFF+Bak_PPMValue)>>8);	 
+				} 
+
+				gCalibflag = 1;
+				USART_TxRsp(u2Status,OPCODE_SET_CALIB);
+
+			}
+			else if(OPCODE_REQ_OK== g_UART_COM_BUF[OFFSET_OP])
+			{
+				vIom_LsclkOutDis();
+				u2Status = RSP_SET_SUCCESS;
+				USART_TxRsp(u2Status,OPCODE_REQ_OK);
+				gUseCase = OTPSTATUS_SN_TIME;
+				return;
+			}
+			else if(OPCODE_READ_STATUS== g_UART_COM_BUF[OFFSET_OP])
+			{
+				u2Status = RSP_SET_SUCCESS;
+				USART_TxRsp(u2Status,OPCODE_READ_STATUS);
+			}
+			else if(OPCODE_READ_CALIB== g_UART_COM_BUF[OFFSET_OP])
+			{
+				u2Status = RSP_SET_SUCCESS;
+				USART_TxRsp(u2Status,OPCODE_READ_CALIB);
+			}
+			else
+			{
+				u2Status = RSP_OPCODE_ERR;
+				USART_TxRsp(u2Status,OPCODE_SET_CALIB);
+			}
+		}
+	}
+}
+
+
+/********************************************************************
+Function name:       void vOTP_KEY_CHECK(void)
+Input parameters:
+    void  
+Return:
+    void
+Function:
+    Input Pin Code Process when OTP(been Actived) Power On  	
+********************************************************************/
+//输入PIN 操作
+void vOTP_KEY_CHECK(void)
+{
+	UINT8 i;
+	UINT8 KeyCheckCnt = 0;
+	UINT8 Key_Input = 0xff;
+	//UINT8 KeyPad[13];
+	#if 1
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();	 
+#endif
+    vLcd_Flag_Clear();
+	vLcd_String_Clear();
+	vLcd_Flag_Display(0,1);
+	vLcd_Flag_Display(12,1);
+	vLcd_Flag_Display(13,1);
+	vLcd_Flag_Display(14,1);
+	vLcd_Flag_Display(15,1);
+
+	vLcd_Flag_Display(7,1);
+	vLcd_Flag_Display(5,1);
+	vLcd_Flag_Display(6,1);	
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+
+#ifdef _FPGA_DEMO_EN_
+    vLcd_SetStopMode();
+#endif	
+	vLcd_Flag_Clear();
+	vLcd_String_Clear();
+	vLcd_String_Display("P0kkkkkkkkkk",12);
+#ifdef _FPGA_DEMO_EN_	
+	vLcd_SetDisplayMode(); 
+#endif 
+	//if(u1LowPowerFlag == 1)
+	//{
+	//	vLcd_Flag_Display(10,1);//低电池电量标志
+	//}
+	#endif
+	
+	while(1)
+	{
+		Key_Input = ucGetKeyValue();
+
+		#if 1
+		switch(Key_Input)
+		{
+			case KEY_1:						//KEY_1
+			{
+				if(KeyCheckCnt == 0)
+				{
+					KeyCheckCnt = 1;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_String_Display("111111111111",12);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;
+			}
+			case KEY_2:
+			{
+				if(KeyCheckCnt == 1)
+				{
+					KeyCheckCnt = 2;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_String_Display("222222222222",12);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_3:
+			{
+				if(KeyCheckCnt == 2)
+				{
+					KeyCheckCnt = 3;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_String_Display("333333333333",12);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_4:
+			{
+				if(KeyCheckCnt == 3)
+				{
+					KeyCheckCnt = 4;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_String_Display("444444444444",12);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_5:
+			{
+				if(KeyCheckCnt == 4)
+				{
+					KeyCheckCnt = 5;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_String_Display("555555555555",12);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_6:
+			{
+				if(KeyCheckCnt == 5)
+				{
+					KeyCheckCnt = 6;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_String_Display("666666666666",12);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_OK:
+			{
+				if(KeyCheckCnt == 6)
+				{
+					KeyCheckCnt = 7;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_Flag_Clear();
+					vLcd_String_Clear();
+					vLcd_Flag_Display(3,1);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				else if(KeyCheckCnt == 15)
+				{
+					#if 1
+					if(gUseCase == OTPSTATUS_HARDWARE)
+					{
+						gUseCase = OTPSTATUS_CALIB;		//OTPSTATUS_SN_TIME
+					}
+					else
+					{
+						gUseCase = OTPSTATUS_PARACHECK;
+					}
+					#endif
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();	 	
+#endif
+				    vLcd_Flag_Clear();
+					vLcd_String_Clear();
+
+					vLcd_Flag_Display(3,1);		//成功						
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif
+					return;
+				}
+				break;	
+			}
+			case KEY_7:
+			{
+				if(KeyCheckCnt == 7)
+				{
+					KeyCheckCnt = 8;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_Flag_Clear();
+					vLcd_String_Display("777777777777",12);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_8:
+			{
+				if(KeyCheckCnt == 8)
+				{
+					KeyCheckCnt = 9;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_String_Display("888888888888",12);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_9:
+			{
+				if(KeyCheckCnt == 9)
+				{
+					KeyCheckCnt = 10;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_String_Display("999999999999",12);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_DEL:
+			{
+				if(KeyCheckCnt == 10)
+				{
+					KeyCheckCnt = 11;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_Flag_Clear();
+					vLcd_String_Clear();
+					vLcd_Flag_Display(2,1);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_LEFT:
+			{
+				if(KeyCheckCnt == 11)
+				{
+					KeyCheckCnt = 12;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_Flag_Clear();
+					vLcd_Flag_Display(9,1);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_0:
+			{
+				if(KeyCheckCnt == 12)
+				{
+					KeyCheckCnt = 13;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_Flag_Clear();
+					vLcd_String_Display("000000000000",12);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_DOT:
+			{
+				if(KeyCheckCnt == 13)
+				{
+					KeyCheckCnt = 14;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_Flag_Clear();
+					vLcd_String_Clear();
+					for(i=0;i<13;i++)DispKeyPad[i] = '0' + DOT_OFFSET;
+					vLcd_String_Display(DispKeyPad,SCREENLEN);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			case KEY_RIGHT:
+			{
+				if(KeyCheckCnt == 14)
+				{
+					KeyCheckCnt = 15;
+					#ifdef _FPGA_DEMO_EN_
+				    vLcd_SetStopMode();
+					#endif	
+					vLcd_Flag_Clear();
+					vLcd_String_Clear();
+					vLcd_Flag_Display(4,1);
+					#ifdef _FPGA_DEMO_EN_	
+					vLcd_SetDisplayMode(); 
+					#endif
+				}
+				break;	
+			}
+			default:
+				break;
+				
+		}
+		#endif
+		//if((gFlag_1S >= 120))	
+		//{
+			/**********直接进入休眠***********/
+		//	vScu_SetSysClk32K(); 
+		//	vScu_StandbyModeEn();
+		//}
+	}
+}
+
+
+/********************************************************************
+Function name:       void vInputPin(void)
+Input parameters:
+    void  
+Return:
+    void
+Function:
+    Input Pin Code Process when OTP(been Actived) Power On  	
+********************************************************************/
+
+void vOTP_InputSN_Time(void)
+{
+	//u1 i;
+	u2 u2Status;
+	//u2 u2Len;
+	//u1 pu1MacKey[16];
+	
+	#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();			
+#endif
+    vLcd_Flag_Clear();
+	vLcd_String_Clear();
+	vLcd_String_Display("P2kkkkkkkkkk",12);
+	if(u1LowPowerFlag == 1)
+	{
+		vLcd_Flag_Display(10,1);//低电池电量标志
+	}
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+	vUartInit();
+
+	while(1)
+	{
+		u2Status = ReceiveData_Poll();
+
+		if(u2Status == RSP_SET_SUCCESS)
+		{
+			if(OPCODE_READ_STATUS == g_UART_COM_BUF[OFFSET_OP])
+			{
+				USART_TxRsp(u2Status,OPCODE_READ_STATUS);
+				//OSTimeDly(1);					//text
+				//u2Status	=RSP_SET_FAIL;
+			}
+			else if(OPCODE_SN_TIME== g_UART_COM_BUF[OFFSET_OP])
+			{
+				if ( OTPSECU_OP_OK == CosOperation(OP_SN, &g_UART_COM_BUF[OFFSET_DATA],0x00))
+				{
+					gTimer_Count_Base = GetBaseTime(&g_UART_COM_BUF[OFFSET_DATA+SN_LEN]);
+
+					//vTbcInit();		//打开TBC模块
+					vTbc_StartDis();
+					vTbc_StartEn();
+					gUseCase = 	OTPSTATUS_MACKEY;					//OTPSTATUS_MACKEY;
+					u2Status	=RSP_SET_SUCCESS;
+					USART_TxRsp(u2Status,OPCODE_SN_TIME);
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();			
+#endif
+					vLcd_Flag_Clear();
+					vLcd_String_Clear();
+					vLcd_Flag_Display(3,1);		//成功
+					vLcd_String_Display("P2kkkkkkkkkk",12);
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif
+                    vTbc_ReadBakCounter();
+                    gBackupTBCInitVal = ulGetTbcCountVlaue();
+					return;
+				}
+				else
+				{
+					u2Status	=RSP_COS_ERR;
+					USART_TxRsp(u2Status,OPCODE_SN_TIME);
+				}
+			}
+			else if(OPCODE_CHANGE_STATUS== g_UART_COM_BUF[OFFSET_OP])
+			{
+				if(0x00 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					gUseCase = OTPSTATUS_HARDWARE;
+					USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);	
+					break;
+
+				}
+				else if(0x01 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					gUseCase = OTPSTATUS_CALIB;
+					USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);	
+					break;
+				}
+				else if(0x02 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);
+					//u2Status	=RSP_SET_FAIL;
+				}
+				else
+				{
+					u2Status = RSP_OPCODE_ERR;
+					USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+				}
+			}
+			else if(OPCODE_READ_VERSION== g_UART_COM_BUF[OFFSET_OP])
+			{
+				USART_TxRsp(u2Status,OPCODE_READ_VERSION);
+				//u2Status	=RSP_SET_FAIL;
+			}
+			else
+			{
+				u2Status = RSP_OPCODE_ERR;
+				USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+			}
+		}
+		else if(RSP_REV_TIMEOUT ==u2Status)
+		{	
+			u2Status	=RSP_REV_TIMEOUT;
+		}
+		else if(RSP_CHK_FAIL ==u2Status)
+		{	
+			u2Status	=RSP_CHK_FAIL;
+			USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+		}
+		else if(RSP_DATA_ERR == u2Status)
+		{
+			USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+		}
+		
+	}
+
+}
+
+/********************************************************************
+Function name:       void vInputPin(void)
+Input parameters:
+    void  
+Return:
+    void
+Function:
+    Input Pin Code Process when OTP(been Actived) Power On  	
+********************************************************************/
+
+void vOTP_InputMacKey_SeedKey(void)
+{
+	//u1 i;
+	u2 u2Status;
+	//u2 u2Len;
+	//u1 pu1MacKey[16];
+	
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();			
+#endif
+    vLcd_Flag_Clear();
+	vLcd_String_Clear();
+	vLcd_String_Display("P3kkkkkkkkkk",12);
+	if(u1LowPowerFlag == 1)
+	{
+		vLcd_Flag_Display(10,1);//低电池电量标志
+	}
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+	vUartInit();
+
+	while(1)
+	{
+		u2Status = ReceiveData_Poll();
+
+		if(u2Status	== RSP_SET_SUCCESS)
+		{ 
+			if(OPCODE_READ_STATUS == g_UART_COM_BUF[OFFSET_OP])
+			{
+				USART_TxRsp(u2Status,OPCODE_READ_STATUS);
+				//u2Status	=RSP_SET_FAIL;
+			}
+			else if(OPCODE_MK_SK == g_UART_COM_BUF[OFFSET_OP])
+			{
+				if ( OTPSECU_OP_OK == CosOperation(OP_MACKEY_SEEDKEY, &g_UART_COM_BUF[OFFSET_DATA],0x00))
+				{
+					gUseCase = OTPSTATUS_CRCSNTIME;			
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();			
+#endif
+				    vLcd_Flag_Clear();
+					vLcd_String_Clear();
+					vLcd_Flag_Display(3,1);		//成功
+					vLcd_String_Display("P3kkkkkkkkkk",12);
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif
+					USART_TxRsp(u2Status,OPCODE_MK_SK);	
+					u2Status	=RSP_SET_SUCCESS;				
+					
+					//break;
+					return;
+				}
+				else
+				{
+					u2Status	=RSP_COS_ERR;
+					USART_TxRsp(u2Status,OPCODE_MK_SK);
+				}
+			}
+			else if(OPCODE_REQ_OK == g_UART_COM_BUF[OFFSET_OP])
+			{
+				u2Status = RSP_OPCODE_ERR;
+				USART_TxRsp(u2Status,OPCODE_REQ_OK);
+			}
+			else if(OPCODE_CHANGE_STATUS== g_UART_COM_BUF[OFFSET_OP])
+			{
+				if(0x00 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);	
+					gUseCase = OTPSTATUS_HARDWARE;
+					
+				}
+				else if(0x01 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					gUseCase = OTPSTATUS_CALIB;
+					USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);			//uart_test
+					break;
+				}
+				else if(0x02 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					gUseCase = OTPSTATUS_SN_TIME;
+					USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);			//uart_test
+					break;
+				}
+				else if(0x03 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);
+				}
+				else if(0x04 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					if(gUseCase == OTPSTATUS_ACTIVATE)
+					{
+						USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);
+					}
+					else
+					{
+						u2Status = RSP_OPCODE_ERR;
+						USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+					}
+				}
+				else	
+				{
+					u2Status = RSP_OPCODE_ERR;
+					USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+				}
+			}
+			else if(OPCODE_READ_VERSION== g_UART_COM_BUF[OFFSET_OP])
+			{
+				USART_TxRsp(u2Status,OPCODE_READ_VERSION);
+			}
+			else
+			{
+				u2Status = RSP_OPCODE_ERR;
+				USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+			}			
+		}
+		else if(RSP_REV_TIMEOUT ==u2Status)
+		{	
+			u2Status	=RSP_REV_TIMEOUT;
+		}
+		else if(RSP_CHK_FAIL ==u2Status)
+		{	
+			u2Status	=RSP_CHK_FAIL;
+			USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+		}
+		else 
+		{
+			USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+		}
+		
+	}
+
+}
+
+void vOTP_CRC_SN_TIME(void)
+{
+	//u1 i;
+	u2 u2Status;
+	//u2 u2Len;
+	//u1 pu1MacKey[16];
+	
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();			
+#endif
+    vLcd_Flag_Clear();
+	vLcd_String_Clear();
+	vLcd_String_Display("P4kkkkkkkkkk",12);
+	if(u1LowPowerFlag == 1)
+	{
+		vLcd_Flag_Display(10,1);//低电池电量标志
+	}
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+	vUartInit();
+
+	while(1)
+	{
+		u2Status = ReceiveData_Poll();
+
+		if(u2Status	== RSP_SET_SUCCESS)
+		{ 
+			if(OPCODE_READ_STATUS == g_UART_COM_BUF[OFFSET_OP])
+			{
+				USART_TxRsp(u2Status,OPCODE_READ_STATUS);
+				//u2Status	=RSP_SET_FAIL;
+			}
+			else if(OPCODE_READ_TIME== g_UART_COM_BUF[OFFSET_OP])
+			{
+				USART_TxRsp(u2Status,OPCODE_READ_TIME);
+				//u2Status = RSP_SET_FAIL;
+			}
+			else if(OPCODE_READ_SN== g_UART_COM_BUF[OFFSET_OP])
+			{
+				USART_TxRsp(u2Status,OPCODE_READ_SN);
+				//u2Status = RSP_SET_FAIL;
+
+			}
+			else if(OPCODE_REQ_OK == g_UART_COM_BUF[OFFSET_OP])
+			{
+				if(gUseCase == OTPSTATUS_MACKEY)
+				{
+					u2Status	=RSP_OPCODE_ERR;
+					USART_TxRsp(u2Status,OPCODE_REQ_OK);
+					//gUseCase = OTPSTATUS_ACTIVATE;
+					//break;   
+				}
+				else if(gUseCase == OTPSTATUS_CRCSNTIME)
+				{                    
+					if((0xA0 == g_UART_COM_BUF[OFFSET_DATA])&&(0x02 == g_UART_COM_BUF[OFFSET_DATA + 1]))
+					{
+                        u2Status	=RSP_SET_SUCCESS;
+						USART_TxRsp(u2Status,OPCODE_REQ_OK);
+						gUseCase = OTPSTATUS_PARACHECK;   
+						
+                        #if 1
+                        vScu_SetSysClkOsc2M();
+                        IC_Temperature_Test();
+    				    vFreqAdj(0);
+    				    vScu_SetSysClk32K();
+                        vScu_WakeUpTimerWakeUp_1Hour();         //设置1小时定时唤醒 20150515 	
+                        WT_Onehour_Flag = 1;
+                        #endif	
+                        
+						return;
+					}
+					else
+					{
+						u2Status	=RSP_OPCODE_ERR;
+						USART_TxRsp(u2Status,OPCODE_REQ_OK);
+					}
+				}
+			}
+			else if(OPCODE_CHANGE_STATUS== g_UART_COM_BUF[OFFSET_OP])
+			{
+				if(0x00 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);	
+					gUseCase = OTPSTATUS_HARDWARE;
+					
+				}
+				else if(0x01 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					gUseCase = OTPSTATUS_CALIB;
+					USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);		
+					break;
+				}
+				else if(0x02 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					gUseCase = OTPSTATUS_SN_TIME;
+					USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);			
+					break;
+				}
+				else if(0x03 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);
+				}
+				else if(0x04 == g_UART_COM_BUF[OFFSET_DATA])
+				{
+					if(gUseCase == OTPSTATUS_ACTIVATE)
+					{
+						USART_TxRsp(u2Status,OPCODE_CHANGE_STATUS);
+					}
+					else
+					{
+						u2Status = RSP_OPCODE_ERR;
+						USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+					}
+				}
+				else	
+				{
+					u2Status = RSP_OPCODE_ERR;
+					USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+				}
+			}
+			else if(OPCODE_READ_VERSION== g_UART_COM_BUF[OFFSET_OP])
+			{
+				USART_TxRsp(u2Status,OPCODE_READ_VERSION);
+			}
+			else
+			{
+				u2Status = RSP_OPCODE_ERR;
+				USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+			}
+		}
+		else if(RSP_REV_TIMEOUT ==u2Status)
+		{	
+			u2Status	=RSP_REV_TIMEOUT;
+		}
+		else if(RSP_CHK_FAIL ==u2Status)
+		{	
+			u2Status	=RSP_CHK_FAIL;
+			USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+		}
+		else 
+		{
+			USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+		}
+		
+	}
+
+}
+
+
+void vOTP_InputHardware_Check(void)
+{
+	unsigned char Key_Input;
+	u1 InputCnt = 0;
+	u1 u1Time_BCD[6];
+	u1 u1Time_STR[12];
+	u1 u1TempChk1;
+	u1 u1TempChk2;
+	u1 i;	
+	
+	#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();			
+#endif
+    vLcd_Flag_Clear();
+	vLcd_String_Clear();
+	vLcd_String_Display("P5kkkkkkkkkk",12);
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+	//vScu_SetSysClkOsc500K();
+
+	while(1)
+	{
+		Key_Input = ucGetKeyValue();
+		switch(Key_Input)					//屏幕显示
+		{
+			case KEY_1:
+			{
+				memset(DispKeyPad, 0x00, SCREENLEN);
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();	 
+#endif
+			    vLcd_Flag_Clear();
+				vLcd_String_Clear();
+				vLcd_Flag_Display(0,1);
+				vLcd_Flag_Display(1,1);
+				vLcd_Flag_Display(2,1);
+				vLcd_Flag_Display(3,1);
+				vLcd_Flag_Display(4,1);
+				vLcd_Flag_Display(5,1);
+				vLcd_Flag_Display(6,1);
+				vLcd_Flag_Display(7,1);
+				vLcd_Flag_Display(8,1);
+				vLcd_Flag_Display(9,1);	
+				vLcd_Flag_Display(10,1);
+				vLcd_Flag_Display(11,1);
+				vLcd_Flag_Display(12,1);
+				vLcd_Flag_Display(13,1);
+				vLcd_Flag_Display(14,1);
+				vLcd_Flag_Display(15,1);
+				vLcd_String_Display("888888888888",12);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+				break;
+			}
+			case KEY_2:
+			{
+				memset(DispKeyPad, 0x00, SCREENLEN);
+				vOTP_KEY_CHECK();
+				break;
+			}
+			case KEY_3:
+			{
+				memset(DispKeyPad, 0x00, SCREENLEN);
+				vScu_SetSysClkOsc2M();
+				GETOTPTime(&u1Time_Dispaly);
+				vScu_SetSysClk32K();
+
+				for(i=0; i<6; i++)
+				{
+					 u1Time_BCD[i] = DectoBCD(u1Time_Dispaly[i]); 
+				}
+                HexToStr(u1Time_STR,u1Time_BCD,6);
+
+				#ifdef _FPGA_DEMO_EN_
+			    vLcd_SetStopMode();
+				#endif	
+				vLcd_Flag_Clear();
+				vLcd_String_Clear();
+				vLcd_String_Display(u1Time_STR,12);
+				#ifdef _FPGA_DEMO_EN_	
+				vLcd_SetDisplayMode(); 
+				#endif
+				
+				break;
+			}
+			case KEY_4:					//显示SN
+			{
+				memset(DispKeyPad, 0x00, SCREENLEN);
+
+				for(i=0;i<SN_LEN;i++)
+				{
+					DispKeyPad[i] = g_u1SN[SN_LEN-i-0x01];	
+				}
+				u1TempChk1 = Get2121Chk2(DispKeyPad,(u4)10);
+				
+				for(i=0;i<SN_LEN;i++)
+				{
+					DispKeyPad[i] = g_u1SN[SN_LEN-i-0x01] - 0x30;	
+				}
+
+				for(i=0;i<SN_LEN;i++)
+				{
+					DispKeyPad[i] = 9 - g_u1SN[i] + 0x30;	
+				}
+				
+				u1TempChk2 = Get2121Chk2(DispKeyPad,(u4)10);
+
+				for(i=0;i<SN_LEN;i++)
+				{
+					DispKeyPad[i+2] = g_u1SN[i];	
+				}
+
+				DispKeyPad[0] = u1TempChk1 + 0x30;
+				DispKeyPad[1] = u1TempChk2 + 0x30;
+				
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();			
+#endif
+			    vLcd_Flag_Clear();
+				vLcd_String_Clear();
+				vLcd_String_Display(DispKeyPad,12);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+				break;
+			}
+			case KEY_5:
+			{
+				DispKeyPad[InputCnt++] = '5';
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();			
+#endif
+			    vLcd_Flag_Clear();
+				vLcd_String_Clear();
+				vLcd_String_Display(DispKeyPad,InputCnt);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+				break;
+			}
+			case KEY_6:
+			{
+				DispKeyPad[InputCnt++] = '6';
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();			
+#endif
+			    vLcd_Flag_Clear();
+				vLcd_String_Clear();
+				vLcd_String_Display(DispKeyPad,InputCnt);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+				break;
+			}
+			case KEY_7:
+			{
+				DispKeyPad[InputCnt++] = '7';
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();			
+#endif
+			    vLcd_Flag_Clear();
+				vLcd_String_Clear();
+				vLcd_String_Display(DispKeyPad,InputCnt);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+				break;
+			}
+			case KEY_8:
+			case KEY_9:
+			case KEY_0:
+			{
+				DispKeyPad[InputCnt++] = Key_Input;
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();			
+#endif
+			    vLcd_Flag_Clear();
+				//vLcd_String_Clear();
+				vLcd_String_Display(DispKeyPad,InputCnt);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+				break;
+			}
+			case KEY_LEFT:
+			{
+				DispKeyPad[InputCnt++] = 'L';
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();			
+#endif
+			    vLcd_Flag_Clear();
+				vLcd_String_Clear();
+				vLcd_String_Display(DispKeyPad,InputCnt);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+				break;
+			}
+			case KEY_RIGHT:
+			{
+				DispKeyPad[InputCnt++] = 'P';
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();			
+#endif
+			    vLcd_Flag_Clear();
+				//vLcd_String_Clear();
+				vLcd_String_Display(DispKeyPad,InputCnt);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+				break;
+			}
+			case KEY_OK:
+			{
+				if(InputCnt == 2 )
+				{
+					if((DispKeyPad[0]=='L')&&(DispKeyPad[1]=='P'))
+					{
+						gUseCase = OTPSTATUS_ACTIVATE;
+						return;
+					}
+					memset(DispKeyPad, 0x00, SCREENLEN);
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();			
+#endif
+				    vLcd_Flag_Clear();
+					//vLcd_String_Clear();
+					vLcd_String_Display("P5kkkkkkkkkk",12);
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif
+				}
+				else if(InputCnt == 3)
+				{
+ 					if((DispKeyPad[0]=='5')&&(DispKeyPad[1]=='6')&&(DispKeyPad[2]=='7'))
+					{
+						gUseCase = OTPSTATUS_CALIB;
+						return;
+					}
+					memset(DispKeyPad, 0x00, SCREENLEN);
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();			
+#endif
+				    vLcd_Flag_Clear();
+					//vLcd_String_Clear();
+					vLcd_String_Display("P5kkkkkkkkkk",12);
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif
+				}				
+				else
+				{
+					memset(DispKeyPad, 0x00, SCREENLEN);
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();			
+#endif
+				    vLcd_Flag_Clear();
+					//vLcd_String_Clear();
+					vLcd_String_Display("P5kkkkkkkkkk",12);
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif
+				}
+				break;
+			}
+			case KEY_DEL:
+			{
+				InputCnt--;
+				DispKeyPad[InputCnt] = 0;
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();			
+#endif
+			    vLcd_Flag_Clear();
+				//vLcd_String_Clear();
+				vLcd_String_Display(DispKeyPad,InputCnt);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+				break;
+				
+			}
+			case KEY_DOT:
+			default:
+				break;
+		}
+
+		//if( (gFlag_1S >= 120)) 
+		//{
+			/**********直接进入休眠***********/
+		//	vScu_SetSysClk32K(); 
+		//	vScu_StandbyModeEn(); 
+		//}
+	}
+}
+
+/********************************************************************
+Function name:       void vInputPin(void)
+Input parameters:
+    void  
+Return:
+    void
+Function:
+    Input Pin Code Process when OTP(been Actived) Power On  	
+********************************************************************/
+//输入PIN 操作
+void vOTP_InputPinProcess(void)
+{
+	UINT8 Key_Input=0xff;
+	UINT8 i=0;
+	UINT8 InputCnt = 0;	
+	UINT8 KBuff[PW_LEN];
+
+	memset(KBuff, 0x00, PW_LEN);
+	//LCD提示用户输入PIN
+	for(i = 0; i<PW_LEN; i++)DispKeyPad[i] = '-';
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();			
+#endif
+    vLcd_Flag_Clear();
+	vLcd_String_Clear();
+			
+	vLcd_Flag_Display(6,1);		//开机
+	vLcd_Flag_Display(7,1);		//密码
+	if(u1LowPowerFlag == 1)
+	{
+		vLcd_Flag_Display(10,1);//低电池电量标志
+	}
+	vLcd_String_Display(DispKeyPad, PW_LEN);
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+    //10s重新定时开始
+	//vScu_TbcIntEn();
+	//gSecCount_10S=0;
+
+	while(1)
+	{
+		Key_Input = ucGetKeyValue();	
+		//if(Key_Input>=0x30 && Key_Input<=0x3f)
+		//{ 	
+		switch(Key_Input)
+		{
+			case KEY_0:
+			case KEY_1:
+			case KEY_2:
+			case KEY_3:
+			case KEY_4:
+			case KEY_5:
+			case KEY_6:
+			case KEY_7:
+			case KEY_8:
+			case KEY_9:
+			    {
+					if(InputCnt < PW_LEN)
+					{
+						KBuff[InputCnt] = Key_Input;
+						DispKeyPad[InputCnt++] = '_';
+#ifdef _FPGA_DEMO_EN_
+						vLcd_SetStopMode();	 	
+#endif
+					    //vLcd_Flag_Clear();
+						//vLcd_String_Clear();
+
+						//vLcd_Flag_Display(6,1);		//密码
+						//vLcd_Flag_Display(7,1);		//开机
+						//vLcd_String_Display(DispKeyPad, PW_LEN);
+						vLcd_Bcd_Display1((PW_LEN-InputCnt),25, 0);		//'_'
+#ifdef _FPGA_DEMO_EN_  
+						vLcd_SetDisplayMode();		
+#endif
+					}
+					break;
+				}
+			case KEY_DEL:			//删除键			     
+				{
+					if(LongPressFlag)
+					{
+						LongPressFlag = 0;
+						memset(KBuff, 0x00, PW_LEN);
+						for(i = 0; i<PW_LEN; i++)DispKeyPad[i] = '-';
+						InputCnt = 0;
+						vLcd_String_Display(DispKeyPad, PW_LEN);
+						break;
+					}
+					
+					if(InputCnt > 0)
+					{
+						InputCnt--;
+						DispKeyPad[InputCnt] = '-';
+						KBuff[InputCnt] = 0x00;
+#ifdef _FPGA_DEMO_EN_
+						vLcd_SetStopMode();	 	
+#endif
+					    //vLcd_Flag_Clear();
+						//vLcd_String_Clear();
+
+						//vLcd_Flag_Display(6,1);		//密码
+						//vLcd_Flag_Display(7,1);		//开机
+						//vLcd_String_Display(DispKeyPad, PW_LEN);
+						vLcd_Bcd_Display1((PW_LEN-InputCnt-1),24, 0);
+#ifdef _FPGA_DEMO_EN_  
+						vLcd_SetDisplayMode();		
+#endif
+					}
+					break;
+				}
+			case KEY_OK:						
+				{
+					if(InputCnt == PW_LEN)	
+					{
+						if(OTPSECU_OP_OK == CosOperation(OP_VERIFY_PASSWORD, KBuff, PW_LEN))
+						{
+							if(g_ModfyPwFlag == 0)
+							 {
+							 	gUseCase = OTPSTATUS_SELECTMODE;
+							 }
+							 else
+							 {
+							 	gUseCase = OTPSTATUS_PWSET;
+							 }
+							 //g_ModfyPwFlag = 0;
+							 
+#ifdef _FPGA_DEMO_EN_
+		                     vLcd_SetStopMode();	                      	                    
+#endif
+							 vLcd_Flag_Clear();
+							 vLcd_String_Clear();
+							 vLcd_Flag_Display(3,1);		//成功
+							 vLcd_Flag_Display(6,1);		//开机
+#ifdef _FPGA_DEMO_EN_  
+		                     vLcd_SetDisplayMode();		
+#endif
+							 vScu_TbcIntEn();
+							 vTbc_Int1HzEn();
+							 gSecCount_10S=0;
+							 while(gSecCount_10S < 2);
+						}
+						else
+						{
+							 //gPinErr_Count++;
+							 //gSecCount_10S=0;
+							 if(gPinErr_Count >= PWLOCK_LIMITED)
+							 {
+							 	gPinErr_Time = Base_Time();
+							 	gUseCase = OTPSTATUS_UNLOCK;
+								//gPinErr_6TimeFlag = 1;
+							 }
+							 else
+							 {
+							 	if(gsuperpw == 0)
+							 	{
+							 		gUseCase = OTPSTATUS_PWVERIFY;
+							 	}
+							 	else
+							 	{
+							 		gsuperpw = 0;
+							 	}
+							 }
+#ifdef _FPGA_DEMO_EN_
+		                     vLcd_SetStopMode();	                      	                    
+#endif
+							 vLcd_Flag_Clear();
+							 vLcd_String_Clear();
+							 vLcd_Flag_Display(2,1);		//错误
+							 vLcd_Flag_Display(6,1);		//开机
+
+							 DispKeyPad[0] = gPinErr_Count + 0x30;
+							 vLcd_String_Display(DispKeyPad,1);
+#ifdef _FPGA_DEMO_EN_  
+		                     vLcd_SetDisplayMode();		
+#endif
+							 vScu_TbcIntEn();
+							 vTbc_Int1HzEn();
+							 gSecCount_10S=0;
+							 while(gSecCount_10S < 2);
+						}
+						vScu_TbcIntDis();
+						vTbc_Int1HzDis();
+						return;
+					}
+				}
+			case KEY_DOT:			
+			case KEY_LEFT:
+			case KEY_RIGHT:	
+			default:
+				break;
+		  }
+						
+		//if( (gFlag_1S >= 120)) 
+		//{
+			/**********直接进入休眠***********/
+		//	vScu_SetSysClk32K(); 
+		//	vScu_StandbyModeEn(); 
+		//}
+	}
+	vScu_TbcIntDis();
+	vTbc_Int1HzDis();
+}
+/********************************************************************
+Function name:       void vOTP_SetPinProcess(void)
+Input parameters:
+    void  
+Return:
+    void
+Function:
+    Setting Pin Code Process when The OTP Power On The First Time  	
+********************************************************************/
+//设置PIN 操作
+void vOTP_SetPinProcess(void)
+{
+	
+	UINT8 Key_Input=0xff;
+	UINT8 i=0;
+	UINT8 KBuff[SCREENLEN];
+	UINT8 bSecondInput=0;
+	UINT8 InputCnt;
+	//UINT8 DispIndex;
+
+	InputCnt = 0;
+	
+	for(i = 0; i<PW_SM_LEN; i++)gPin_Save[i] = 0xff;
+	
+	DispKeyPad[0] = 'n';
+	DispKeyPad[1] = 'o';
+	DispKeyPad[1] += 0x80;
+	DispKeyPad[2] = '1';
+	
+	for(i = 3; i<(SCREENLEN - PW_LEN); i++)DispKeyPad[i] = 'k';
+
+	for(i = (SCREENLEN - PW_LEN); i<SCREENLEN; i++)DispKeyPad[i] = '-';
+	
+	
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();	 	
+#endif
+    vLcd_Flag_Clear();
+	vLcd_String_Clear();
+
+	vLcd_Flag_Display(7,1);		//密码
+	vLcd_Flag_Display(6,1);		//开机
+	vLcd_Flag_Display(5,1);		//新
+	if(u1LowPowerFlag == 1)
+	{
+		vLcd_Flag_Display(10,1);//低电池电量标志
+	}
+	vLcd_String_Display(DispKeyPad, SCREENLEN);
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+
+    //10s重新定时开始
+	//vScu_TbcIntEn();
+	//gSecCount_10S=0;
+	while(1)
+	{
+		Key_Input = ucGetKeyValue();	
+		//if(Key_Input>=0x30 && Key_Input<=0x3F)
+		//{
+			switch(Key_Input)
+			{
+				case KEY_0:
+				case KEY_1:
+				case KEY_2:
+				case KEY_3:
+				case KEY_4:
+				case KEY_5:
+				case KEY_6:
+				case KEY_7:
+				case KEY_8:
+				case KEY_9:
+					{
+						if(InputCnt < PW_LEN)
+						{
+							if(bSecondInput == 0)				//第一次输入
+							{
+								KBuff[InputCnt] =  Key_Input;
+							}
+							else
+							{
+								gPin_Save[InputCnt] =  Key_Input;
+							}
+							DispKeyPad[SCREENLEN - PW_LEN + InputCnt] = '_';
+							InputCnt++;
+#ifdef _FPGA_DEMO_EN_
+							vLcd_SetStopMode();	 	
+#endif
+						    //vLcd_Flag_Clear();
+							//vLcd_String_Clear();
+
+							//vLcd_Flag_Display(7,1);		//密码
+							//vLcd_Flag_Display(6,1);		//开机
+							//vLcd_Flag_Display(5,1);		//新
+							///vLcd_String_Display(DispKeyPad, SCREENLEN);
+							vLcd_Bcd_Display1((PW_LEN - InputCnt),25, 0);		//'_'
+#ifdef _FPGA_DEMO_EN_  
+							vLcd_SetDisplayMode();		
+#endif
+						}
+						break;
+					}
+					 break;
+				case KEY_DEL:   //清屏幕
+					{
+						if(LongPressFlag)
+						{
+							InputCnt = 0;
+							LongPressFlag = 0;
+							if(bSecondInput == 0)
+							{	
+								memset(KBuff, 0x00, PW_LEN);
+								
+							}
+							else
+							{
+								memset(gPin_Save, 0x00, PW_LEN);
+							}
+							for(i = (SCREENLEN - PW_LEN); i<SCREENLEN; i++)DispKeyPad[i] = '-';
+							vLcd_String_Display(DispKeyPad, SCREENLEN);
+							break;
+						}
+						
+						if(InputCnt > 0)
+						{
+							InputCnt--;
+							if(bSecondInput == 0)				//第一次输入
+							{
+								KBuff[InputCnt] =  0xff;
+							}
+							else
+							{
+								gPin_Save[InputCnt] =  0xff;
+							}
+							DispKeyPad[SCREENLEN - PW_LEN + InputCnt] = '-';
+#ifdef _FPGA_DEMO_EN_
+							vLcd_SetStopMode();	 	
+#endif
+						    //vLcd_Flag_Clear();
+							//vLcd_String_Clear();
+
+							//vLcd_Flag_Display(7,1);		//密码
+							//vLcd_Flag_Display(6,1);		//开机
+							//vLcd_Flag_Display(5,1);		//新
+							//vLcd_String_Display(DispKeyPad, SCREENLEN);
+							vLcd_Bcd_Display1((PW_LEN - InputCnt-1),24, 0);
+#ifdef _FPGA_DEMO_EN_  
+							vLcd_SetDisplayMode();		
+#endif
+						}
+
+					}
+					 break;
+				case KEY_OK:			//左移动光标
+					{
+						if(InputCnt == PW_LEN)
+						{
+							if(bSecondInput == 0)
+							{
+								//gSecCount_10S=0;
+								InputCnt = 0;
+								bSecondInput = 1;
+#ifdef _FPGA_DEMO_EN_
+								vLcd_SetStopMode();	 	
+#endif
+							    //vLcd_Flag_Clear();
+								//vLcd_String_Clear();
+
+								//vLcd_Flag_Display(7,1);		//密码
+								//vLcd_Flag_Display(6,1);		//开机
+								//vLcd_Flag_Display(5,1);		//新
+								//vLcd_Flag_Display(3,1);		//成功
+								//vLcd_String_Display(DispKeyPad, SCREENLEN);
+#ifdef _FPGA_DEMO_EN_  
+								vLcd_SetDisplayMode();		
+#endif
+								//vScu_TbcIntEn();
+								//gSecCount_10S=0;
+								//while(gSecCount_10S < 2);
+								
+								DispKeyPad[0] = 'n';
+								DispKeyPad[1] = 'o';
+								DispKeyPad[1] += 0x80;
+								DispKeyPad[2] = '2';
+								
+								for(i = 3; i<(SCREENLEN - PW_LEN); i++)DispKeyPad[i] = 'k';
+
+								for(i = (SCREENLEN - PW_LEN); i<SCREENLEN; i++)DispKeyPad[i] = '-';
+							}
+							else
+							{
+								if(0 == memcmp(gPin_Save, KBuff, PW_LEN))		//第一次与第二次相等
+								{
+									if(OTPSECU_OP_OK== CosOperation(OP_SET_PASSWORD, gPin_Save, PW_LEN))
+									{
+										//gPinErr_Count = 0; 
+										gUseCase = OTPSTATUS_PWVERIFY;
+										//gSecCount_10S=0;
+
+										gUnlockPinErr_Count = 0;
+										//gPinErr_6TimeFlag = 0;
+										
+#ifdef _FPGA_DEMO_EN_
+										vLcd_SetStopMode();	 	
+#endif
+									    vLcd_Flag_Clear();
+										vLcd_String_Clear();
+
+										vLcd_Flag_Display(7,1);		//密码
+										vLcd_Flag_Display(6,1);		//新
+										vLcd_Flag_Display(5,1);		//开机
+										vLcd_Flag_Display(3,1);		//成功
+#ifdef _FPGA_DEMO_EN_  
+										vLcd_SetDisplayMode();		
+#endif
+										vScu_TbcIntEn();
+										vTbc_Int1HzEn();
+										gSecCount_10S=0;
+										while(gSecCount_10S < 2);
+										vScu_TbcIntDis();
+										vTbc_Int1HzDis();
+										return;
+									}
+								}
+								else
+								{
+									//gSecCount_10S=0;
+#ifdef _FPGA_DEMO_EN_
+									vLcd_SetStopMode();	 	
+#endif
+								    vLcd_Flag_Clear();
+									//vLcd_String_Clear();
+
+									vLcd_Flag_Display(7,1);		//密码
+									vLcd_Flag_Display(6,1);		//新
+									vLcd_Flag_Display(5,1);		//开机
+									vLcd_Flag_Display(2,1);		//错误
+#ifdef _FPGA_DEMO_EN_  
+									vLcd_SetDisplayMode();		
+#endif
+									vScu_TbcIntEn();
+									vTbc_Int1HzEn();
+									gSecCount_10S=0;
+									while(gSecCount_10S < 2);
+									
+									InputCnt = 0;
+									bSecondInput = 0;
+									
+									DispKeyPad[0] = 'n';
+									DispKeyPad[1] = 'o';
+									DispKeyPad[1] += 0x80;
+									DispKeyPad[2] = '1';
+									
+									for(i = 3; i<(SCREENLEN - PW_LEN); i++)DispKeyPad[i] = 'k';
+
+									for(i = (SCREENLEN - PW_LEN); i<SCREENLEN; i++)DispKeyPad[i] = '-';
+								}
+							}
+#ifdef _FPGA_DEMO_EN_
+							vLcd_SetStopMode();	 	
+#endif
+						    vLcd_Flag_Clear();
+							//vLcd_String_Clear();
+
+							vLcd_Flag_Display(7,1);		//密码
+							vLcd_Flag_Display(6,1);		//开机
+							vLcd_Flag_Display(5,1);		//新
+							vLcd_String_Display(DispKeyPad, SCREENLEN);
+#ifdef _FPGA_DEMO_EN_  
+							vLcd_SetDisplayMode();		
+#endif
+						}
+					}
+					 break;
+				case KEY_LEFT:
+				case KEY_RIGHT:
+				case KEY_DOT:
+					break;
+				default:
+					break;
+					
+			 }
+						
+		 //}
+		// else
+		// {
+			  //低功耗suspend MODE			  
+			  //vScu_SuspendModeEn();
+		//	   vFlag1S_DispClr();
+		// }
+	 }
+	 vScu_TbcIntDis();
+	 vTbc_Int1HzDis();
+}
+/********************************************************************
+Function name:       void vOTP_UnlockPinProcess(void)
+Input parameters:
+    void  
+Return:
+    void
+Function:
+    Unlock The OTP in Manual Operation when The OTP Been Locked  	
+********************************************************************/
+//解除锁定操作
+void vOTP_UnlockPinProcess(void)
+{
+	UINT8 Key_Input=15,i=0;
+	//i = 0;
+	UINT8 u1Buffer[CHAL_LEN];
+	UINT8 InputCnt = 0;
+	
+	if( OTPSECU_OP_OK == CosOperation(OP_UNLOCK_CODE, u1Buffer,InputCnt))
+	{
+		for(i=0; i<CHAL_LEN; i++)DispKeyPad[i] = u1Buffer[CHAL_LEN - i - 1];		//u1Buffer[i];	显示正反不一样
+	}
+	
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();		
+#endif
+    vLcd_Flag_Clear();
+	vLcd_String_Clear();
+	
+	vLcd_Flag_Display(8,1);			//锁定
+	if(u1LowPowerFlag == 1)
+	{
+		vLcd_Flag_Display(10,1);//低电池电量标志
+	}
+	vLcd_String_Display(DispKeyPad, CHAL_LEN);
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+	while(1)
+	{
+		Key_Input = ucGetKeyValue();	
+		if(Key_Input>=0x30 && Key_Input<=0x3f)
+		{
+			break;
+		}
+	}
+
+	for(i=0; i<CHAL_LEN; i++)DispKeyPad[i] = '-';
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();		
+#endif
+    //vLcd_Flag_Clear();
+	//vLcd_String_Clear();
+	
+	//vLcd_Flag_Display(8,1);			//锁定
+	vLcd_Flag_Display(7,1);				//mi ma
+	vLcd_String_Display(DispKeyPad, CHAL_LEN);
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+    //10s重新定时开始
+	//vScu_TbcIntEn();
+	//gSecCount_10S=0;
+	while(1)
+	{
+		Key_Input = ucGetKeyValue();	
+		//if(Key_Input>=0x30 && Key_Input<=0x3f)
+		//{
+			//如果是正常的数据，存入接受数组 
+			//如果移动了光标位置，则修改光标位置的数据
+		switch(Key_Input)
+		{
+			case KEY_0:
+			case KEY_1:
+			case KEY_2:
+			case KEY_3:
+			case KEY_4:
+			case KEY_5:
+			case KEY_6:
+			case KEY_7:
+			case KEY_8:
+			case KEY_9:
+			{
+				if(InputCnt < CHAL_LEN)
+				{
+					DispKeyPad[InputCnt++] = Key_Input;
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();		
+#endif
+				    //vLcd_Flag_Clear();
+					//vLcd_String_Clear();
+					
+					//vLcd_Flag_Display(8,1);			//锁定
+					//vLcd_String_Display(DispKeyPad, CHAL_LEN);
+					vLcd_Bcd_Display1((CHAL_LEN-InputCnt),(Key_Input - 0x30), 0);
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif
+					
+				}
+				break;	
+			}
+			case KEY_DEL:
+				{
+					if(LongPressFlag)
+					{
+						LongPressFlag = 0;
+						for(i=0; i<CHAL_LEN; i++)DispKeyPad[i] = '-';
+						InputCnt = 0;
+						//vLcd_String_Clear();
+						vLcd_String_Display(DispKeyPad, CHAL_LEN);
+						break;
+					}
+
+					if(InputCnt == 0)
+					{
+						return;
+					}
+					
+					if(InputCnt > 0)
+					{
+						InputCnt--;
+						DispKeyPad[InputCnt] = '-';
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();		
+#endif
+				   // vLcd_Flag_Clear();
+					//vLcd_String_Clear();
+					
+					//vLcd_Flag_Display(8,1);			//锁定
+					//vLcd_String_Display(DispKeyPad, CHAL_LEN);
+					vLcd_Bcd_Display1((CHAL_LEN-InputCnt-1),24, 0);
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif
+					}
+					break;
+				}
+			case KEY_OK:			//左移动光标
+				{
+					if(InputCnt == CHAL_LEN)
+					{
+						for(i=0; i<CHAL_LEN; i++)u1Buffer[i] = DispKeyPad[i];
+						if ( OTPSECU_OP_OK == CosOperation(OP_UNLOCK_TOKEN, u1Buffer,InputCnt))
+						{
+							g_AutoUnlockCnt = 0;
+							gUnlockPinErr_Count = 0;
+							gPinErr_Count = 0;
+							g_ModfyPwFlag = 0;
+							gUseCase = OTPSTATUS_PWSET;
+
+							#ifdef _FPGA_DEMO_EN_
+							vLcd_SetStopMode();	 	
+#endif
+						    vLcd_Flag_Clear();
+							vLcd_String_Clear();
+
+							vLcd_Flag_Display(3,1);		//
+#ifdef _FPGA_DEMO_EN_  
+							vLcd_SetDisplayMode();		
+#endif
+							vScu_TbcIntEn();
+							vTbc_Int1HzEn();
+							gSecCount_10S=0;
+							while(gSecCount_10S < 2);
+							
+							vScu_TbcIntDis();
+							vTbc_Int1HzDis();
+							return;
+						}
+						else
+						{
+							gUnlockPinErr_Count++;
+							//gSecCount_10S=0;
+#ifdef _FPGA_DEMO_EN_
+							vLcd_SetStopMode();	 	
+#endif
+						    vLcd_Flag_Clear();
+							vLcd_String_Clear();
+
+							vLcd_Flag_Display(2,1);		//错误
+#ifdef _FPGA_DEMO_EN_  
+							vLcd_SetDisplayMode();		
+#endif
+							vScu_TbcIntEn();
+							vTbc_Int1HzEn();
+							gSecCount_10S=0;
+							while(gSecCount_10S < 60);
+
+							if(gUnlockPinErr_Count <=10)
+							{
+								gUseCase = OTPSTATUS_UNLOCK;
+							}
+							else
+							{
+								gUseCase = OTPSTATUS_INVALID;
+							}
+							
+							vScu_TbcIntDis();
+							vTbc_Int1HzDis();
+							return;
+						}
+					}
+				 	break;
+				}
+			case KEY_DOT:			//右移动光标
+			case KEY_LEFT:
+			case KEY_RIGHT:
+			default	:
+				 break;
+		}			
+		
+		//}
+		//else
+		//{
+			 //低功耗SUSPEND MODE			 
+			 //vScu_SuspendModeEn();
+		//	 vFlag1S_DispClr();
+		//}
+	}
+	vScu_TbcIntDis();
+
+}
+/********************************************************************
+Function name:       void vOtp_RunModeProcesss(void)
+Input parameters:
+    void  
+Return:
+    void
+Function:
+    OTP RUN MODE PROCESS,IT CAN GENERATE THE DYNAMIC  PASSWORD CODE IN THIS STATUS 	
+********************************************************************/
+//产生挑战码并计算密码PIN密码
+void vOTP_RunModeProcess(void)
+{
+	UINT8 InputCnt = 0;
+	UINT8 Key_Input=0xff;
+	//UINT8 *u1Buffer;
+	//gUnlockPinErr_Count = 0;
+
+	memset(DispKeyPad, 0x00, SCREENLEN);
+	DispKeyPad[0] = '-';
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();	 	
+#endif
+    vLcd_Flag_Clear();
+	vLcd_String_Clear();
+
+	vLcd_Flag_Display(4,1);			//信息
+	if(u1LowPowerFlag == 1)
+	{
+		vLcd_Flag_Display(10,1);//低电池电量标志
+	}
+	vLcd_String_Display(DispKeyPad, 1);
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+    //10s重新定时开始
+	//vScu_TbcIntEn();
+	//gSecCount_10S=0;
+
+	//系统处于正常模式
+	while(1)
+	{
+		Key_Input = ucGetKeyValue();	
+		//if(Key_Input>=0x30 && Key_Input<=0x3f)
+		//{
+			//如果移动了光标位置，则修改光标位置的数据
+			switch(Key_Input)
+			{
+				case KEY_0:
+				case KEY_1:
+				case KEY_2:
+				case KEY_3:
+				case KEY_4:
+				case KEY_5:
+				case KEY_6:
+				case KEY_7:
+				case KEY_8:
+				case KEY_9:
+					 {
+					 	DispKeyPad[0] = Key_Input;
+#ifdef _FPGA_DEMO_EN_
+						vLcd_SetStopMode();	 	
+#endif
+						//vLcd_String_Clear();
+
+						//vLcd_String_Display(DispKeyPad, 1);
+						vLcd_Bcd_Display1(0,Key_Input - 0x30, 0);
+#ifdef _FPGA_DEMO_EN_  
+						vLcd_SetDisplayMode();		
+#endif
+						gUseCase = OTPSTATUS_PAY;						
+						
+					 	return;
+					 }
+				case KEY_OK:	 
+					{	
+						if(LongPressFlag)
+						{
+							LongPressFlag = 0;
+							g_ModfyPwFlag = 1;
+							gUseCase = OTPSTATUS_PWVERIFY;
+							return;
+						}
+						if((InputCnt == 0))
+						{
+							gUseCase = OTPSTATUS_TIMETOKEN;	
+							return;
+						}
+					}
+					 break;
+			 }			
+			
+		//}
+		//else
+		//{			
+			//低功耗SUSPEND MODE			
+			//vScu_SuspendModeEn();
+		//	 vFlag1S_DispClr();
+		//}
+	}
+	vScu_TbcIntDis();
+
+}
+
+void VOTP_TimeToken(void)				//闪动点要显示吗?
+{
+	UINT8 i;
+	UINT8 u1Buffer[8];
+	UINT8 Key_Input;
+	//u4 u4TimeTick;
+	
+	memset(DispKeyPad, 0x00, SCREENLEN);
+	if(OTPSECU_OP_OK== CosOperation(OP_TIME_TOKEN, u1Buffer, 0x00))
+	{
+		for(i=0; i<TIME_TOKEN_LEN; i++)DispKeyPad[i] = u1Buffer[i];	
+
+#ifdef _FPGA_DEMO_EN_
+		vLcd_SetStopMode();	 	
+#endif
+	    vLcd_Flag_Clear();
+		vLcd_String_Clear();
+
+		vLcd_String_Display(DispKeyPad, TIME_TOKEN_LEN);
+#ifdef _FPGA_DEMO_EN_  
+		vLcd_SetDisplayMode();		
+#endif
+	}
+	else
+	{
+#ifdef _FPGA_DEMO_EN_
+		vLcd_SetStopMode();	 	
+#endif
+	    vLcd_Flag_Clear();
+		//vLcd_String_Clear();
+
+		vLcd_Flag_Display(2,1);			//错误
+#ifdef _FPGA_DEMO_EN_  
+		vLcd_SetDisplayMode();		
+#endif
+		vScu_TbcIntEn();
+		vTbc_Int1HzEn();
+		gSecCount_10S=0;
+		while(gSecCount_10S < 2);
+		vScu_TbcIntDis();
+		vTbc_Int1HzDis();
+		gUseCase = OTPSTATUS_SELECTMODE;
+		return;
+	}
+
+	if(u1LowPowerFlag == 1)
+	{
+		vLcd_Flag_Display(10,1);//低电池电量标志
+	}
+
+	vScu_TbcIntEn();
+	vTbc_Int1HzEn();
+	gFlag_1S = 0;
+	//gSecCount_10S = (UINT8)((gTimer_Count_Base + TBC_COUNT_VALUE)%60);
+	gSecCount_10S = (UINT8)((gTimer_Count_Base + Base_Time())%60);
+
+	if(gSecCount_10S < 10)
+	{
+#ifdef _FPGA_DEMO_EN_
+		vLcd_SetStopMode();	 	
+#endif
+		vLcd_Flag_Display(0,1);
+		vLcd_Flag_Display(12,1);
+		vLcd_Flag_Display(13,1);
+		vLcd_Flag_Display(14,1);
+		vLcd_Flag_Display(15,1);
+#ifdef _FPGA_DEMO_EN_  
+		vLcd_SetDisplayMode();		
+#endif
+	}
+	else if(gSecCount_10S < 20)
+	{
+#ifdef _FPGA_DEMO_EN_
+		vLcd_SetStopMode();	 	
+#endif
+		vLcd_Flag_Display(12,1);
+		vLcd_Flag_Display(13,1);
+		vLcd_Flag_Display(14,1);
+		vLcd_Flag_Display(15,1);
+#ifdef _FPGA_DEMO_EN_  
+		vLcd_SetDisplayMode();		
+#endif
+	}
+	else if(gSecCount_10S < 30)
+	{
+#ifdef _FPGA_DEMO_EN_
+		vLcd_SetStopMode();	 	
+#endif
+		vLcd_Flag_Display(13,1);
+		vLcd_Flag_Display(14,1);
+		vLcd_Flag_Display(15,1);
+#ifdef _FPGA_DEMO_EN_  
+		vLcd_SetDisplayMode();		
+#endif
+	}
+	else if(gSecCount_10S < 40)
+	{
+#ifdef _FPGA_DEMO_EN_
+		vLcd_SetStopMode();	 	
+#endif
+		vLcd_Flag_Display(14,1);
+		vLcd_Flag_Display(15,1);
+#ifdef _FPGA_DEMO_EN_  
+		vLcd_SetDisplayMode();		
+#endif
+	}
+	else if(gSecCount_10S < 50)
+	{
+#ifdef _FPGA_DEMO_EN_
+		vLcd_SetStopMode();	 	
+#endif
+		vLcd_Flag_Display(15,1);
+#ifdef _FPGA_DEMO_EN_  
+		vLcd_SetDisplayMode();		
+#endif
+	}
+
+	vScu_TbcWakeupEn();		// bi xu
+	while(1)
+	{
+		Key_Input = ucGetKeyValue();	
+		if(Key_Input>=0x30 && Key_Input<=0x3F) 
+		{
+			//gFlag_1S = 0;
+			gUseCase = OTPSTATUS_SELECTMODE;
+			vScu_TbcIntDis();
+			vTbc_Int1HzDis();
+			vScu_TbcWakeupDis()	;		//bixu
+			return;
+		}
+		else
+		{
+			if(gSecCount_10S == 10)
+			{
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();	 	
+#endif
+				//vLcd_Flag_Clear();
+
+				vLcd_Flag_Display(0,0);
+				vLcd_Flag_Display(12,1);
+				vLcd_Flag_Display(13,1);
+				vLcd_Flag_Display(14,1);
+				vLcd_Flag_Display(15,1);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+			}
+			else if(gSecCount_10S == 20)
+			{
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();	 	
+#endif
+				//vLcd_Flag_Clear();
+				//vLcd_Flag_Display(0,0);
+				vLcd_Flag_Display(12,0);
+				vLcd_Flag_Display(13,1);
+				vLcd_Flag_Display(14,1);
+				vLcd_Flag_Display(15,1);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+			}
+			else if(gSecCount_10S == 30)
+			{
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();	 	
+#endif
+				//vLcd_Flag_Clear();
+				//vLcd_Flag_Display(0,0);
+				//vLcd_Flag_Display(12,0);
+				vLcd_Flag_Display(13,0);
+				vLcd_Flag_Display(14,1);
+				vLcd_Flag_Display(15,1);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+			}
+			else if(gSecCount_10S == 40)
+			{
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();	 	
+#endif
+				//vLcd_Flag_Clear();
+				//vLcd_Flag_Display(0,0);
+				//vLcd_Flag_Display(12,0);
+				//vLcd_Flag_Display(13,0);
+				vLcd_Flag_Display(14,0);
+				vLcd_Flag_Display(15,1);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+			}
+			else if(gSecCount_10S == 50)
+			{
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();	 	
+#endif
+				//vLcd_Flag_Clear();
+				//vLcd_Flag_Display(0,0);
+				//vLcd_Flag_Display(12,0);
+				//vLcd_Flag_Display(13,0);
+				//vLcd_Flag_Display(14,0);
+				vLcd_Flag_Display(15,0);
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+			}
+			else if(gSecCount_10S > 59)
+			{
+				gSecCount_10S = 0;
+				if(OTPSECU_OP_OK== CosOperation(OP_TIME_TOKEN, u1Buffer, 0x00))
+				{
+					for(i=0; i<TIME_TOKEN_LEN; i++)DispKeyPad[i] = u1Buffer[i];
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();	 	
+#endif
+					vLcd_Flag_Display(0,1);
+					vLcd_Flag_Display(12,1);
+					vLcd_Flag_Display(13,1);
+					vLcd_Flag_Display(14,1);
+					vLcd_Flag_Display(15,1);
+					vLcd_String_Display(DispKeyPad, TIME_TOKEN_LEN);
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif			
+				}
+				else
+				{
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();	 	
+#endif
+				    vLcd_Flag_Clear();
+					//vLcd_String_Clear();
+
+					vLcd_Flag_Display(2,1);			//错误
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif
+					vScu_TbcIntEn();
+					vTbc_Int1HzEn();
+					gSecCount_10S=0;
+					while(gSecCount_10S < 2);
+					vScu_TbcIntDis();
+					vTbc_Int1HzDis();
+					vScu_TbcWakeupDis();
+					gUseCase = OTPSTATUS_SELECTMODE;
+					return;
+				}
+			}
+		}
+
+		if( (gFlag_1S >= 120)) 
+		{
+			vScu_SetSysClk32K(); 
+			vScu_StandbyModeEn(); 
+		}
+	}
+	
+}
+/********************************************************************
+Function name:       void vOtp_ActiveProcess(void)
+Input parameters:
+    void  
+Return:
+    void
+Function:
+    OTP ACTIVE MODE PROCESS 	
+********************************************************************/
+//激活OTP
+void vOTP_ActiveProcess(void)
+{
+    UINT8 Key_Input=0xff,i=0;	 	
+	UINT8 k = 0;
+	//UINT8 ActiveBuf[6]={"012345"};
+	UINT8 InputCnt = 0;
+	UINT8 KBuff[AC_LEN];
+
+	memset(KBuff, 0x00, AC_LEN);
+	for(i = 0; i<SCREENLEN; i++)DispKeyPad[i] = '-';
+	//DispKeyPad[0] = 'k';
+	
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();	 	
+#endif
+    vLcd_Flag_Clear();
+	vLcd_String_Clear();
+
+	vLcd_Flag_Display(9,1);		//激活
+	if(u1LowPowerFlag == 1)
+	{
+		vLcd_Flag_Display(10,1);//低电池电量标志
+	}
+	vLcd_String_Display(DispKeyPad, SCREENLEN);
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+    //10s重新定时开始
+	//vScu_TbcIntEn();
+	//gSecCount_10S=0;
+		//系统处于正常模式
+	
+	while(1)
+	{
+		Key_Input = ucGetKeyValue();	
+		//if(Key_Input>=0x30 && Key_Input<=0x3f)
+		//{ 		
+			//如果移动了光标位置，则修改光标位置的数据
+		switch(Key_Input)
+		{
+			case KEY_0:
+			case KEY_1:
+			case KEY_2:
+			case KEY_3:
+			case KEY_4:
+			case KEY_5:
+			case KEY_6:
+			case KEY_7:
+			case KEY_8:
+			case KEY_9:
+			{
+				if(InputCnt < AC_LEN)
+				{
+					KBuff[InputCnt] = Key_Input;
+					DispKeyPad[InputCnt] = Key_Input;
+					InputCnt++;
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();	 	
+#endif
+				   // vLcd_Flag_Clear();
+					//vLcd_String_Clear();
+
+					//vLcd_Flag_Display(9,1);		//激活
+					//vLcd_String_Display(DispKeyPad, SCREENLEN);
+					vLcd_Bcd_Display1((SCREENLEN-InputCnt),(Key_Input-0x30), 0);
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif
+				}
+				break;
+			}
+			case KEY_DEL:
+				{
+					if(LongPressFlag)
+					{
+						LongPressFlag = 0;
+						memset(KBuff, 0x00, AC_LEN);
+						for(i = 0; i<AC_LEN; i++)DispKeyPad[i] = '-';
+						InputCnt = 0;
+						vLcd_String_Display(DispKeyPad, AC_LEN);
+						break;
+					}
+					
+					if(InputCnt > 0)
+					{
+						InputCnt--;
+						
+						DispKeyPad[InputCnt] = '-';
+						KBuff[InputCnt] = 0x00;
+#ifdef _FPGA_DEMO_EN_
+						vLcd_SetStopMode();	 	
+#endif
+					    //vLcd_Flag_Clear();
+						//vLcd_String_Clear();
+
+						//vLcd_Flag_Display(9,1);		//激活
+						//vLcd_String_Display(DispKeyPad, SCREENLEN);
+						vLcd_Bcd_Display1((SCREENLEN-InputCnt-1),24,0);		//'-'			//12位的就是-1
+#ifdef _FPGA_DEMO_EN_  
+						vLcd_SetDisplayMode();		
+#endif
+					}
+					break;
+				}
+			case KEY_OK:
+				{
+					if(InputCnt == AC_LEN)
+					{
+						if(OTPSECU_OP_OK ==CosOperation(OP_GEN_SEED, KBuff, AC_LEN))
+						{
+#ifdef _FPGA_DEMO_EN_
+							vLcd_SetStopMode();	 	
+#endif
+						    vLcd_Flag_Clear();
+							vLcd_String_Clear();
+
+							vLcd_Flag_Display(9,1);		//激活
+							vLcd_Flag_Display(3,1);		//成功						
+#ifdef _FPGA_DEMO_EN_  
+							vLcd_SetDisplayMode();		
+#endif
+							vScu_TbcIntEn();
+							vTbc_Int1HzEn();
+							g_ModfyPwFlag = 0;
+							gSecCount_10S=0;
+							while(gSecCount_10S < 2);
+							gUseCase = OTPSTATUS_PWSET;
+						}
+						else
+						{
+#ifdef _FPGA_DEMO_EN_
+							vLcd_SetStopMode();	 	
+#endif
+						    vLcd_Flag_Clear();
+							vLcd_String_Clear();
+
+							vLcd_Flag_Display(9,1);		//激活
+							vLcd_Flag_Display(2,1);		//错误					
+#ifdef _FPGA_DEMO_EN_  
+							vLcd_SetDisplayMode();		
+#endif
+							vScu_TbcIntEn();
+							vTbc_Int1HzEn();
+							gSecCount_10S=0;
+							while(gSecCount_10S < 2);
+							gUseCase = OTPSTATUS_ACTIVATE;
+						}
+						vScu_TbcIntDis();
+						vTbc_Int1HzDis();
+						return;
+					}
+					break;
+				}
+			case KEY_DOT:
+			case KEY_LEFT:			//左移动光标
+			case KEY_RIGHT:			//右移动光标	
+			    break;
+			default:
+				break;
+		 }			
+			
+	}
+	vScu_TbcIntDis();
+	vTbc_Int1HzDis();
+
+}
+/********************************************************************
+Function name:      void vOTP_PAYProcess(void)
+Input parameters:
+    void  
+Return:
+    void
+Function:
+    OTP KEY SEED IMPORT PROCESS 	
+********************************************************************/
+void vOTP_PAYProcess(void)
+{
+	UINT8 Key_Input=0xff;
+	UINT8 InputCnt = 1;
+	UINT8 u1Buffer[PAY_PARA_LEN+1];
+	UINT8 i;
+	UINT8 u1LeftOffset = 0;
+	UINT8 u1RightOffset = 0;
+	UINT8 DotFlag = 0;
+	//UINT8 EndFlag = 0;
+	 EndFlag = 0;
+
+	memset(u1Buffer, 0x00, PAY_PARA_LEN);
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();	 	
+#endif
+    //vLcd_Flag_Clear();
+	//vLcd_String_Clear();
+	if(u1LowPowerFlag == 1)
+	{
+		vLcd_Flag_Display(10,1);//低电池电量标志
+	}
+
+	vLcd_Flag_Display(4,1);		//信息
+	vLcd_String_Display(DispKeyPad, 1);
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+	u1Buffer[0] = DispKeyPad[0];
+
+	while(1)
+	{
+		Key_Input = ucGetKeyValue();
+		switch(Key_Input)
+		{
+			case KEY_0:
+			case KEY_1:
+			case KEY_2:
+			case KEY_3:
+			case KEY_4:
+			case KEY_5:
+			case KEY_6:
+			case KEY_7:
+			case KEY_8:
+			case KEY_9:
+			{
+				if((InputCnt < PAY_PARA_LEN)&&(u1RightOffset == 0))				//&&(EndFlag < 3)
+				{
+					if(InputCnt < SCREENLEN)
+					{
+						DispKeyPad[InputCnt] = 	Key_Input;
+						
+					}
+					else
+					{
+						for(i=0; i<SCREENLEN - 1; i++)
+						{
+							DispKeyPad[i] = DispKeyPad[i+1];
+						}
+						DispKeyPad[i] = Key_Input;
+						u1LeftOffset++;
+					}
+					u1Buffer[InputCnt] = Key_Input;
+					InputCnt++;
+					if(DotFlag)EndFlag++;
+				}
+#ifdef _FPGA_DEMO_EN_
+				vLcd_SetStopMode();	 	
+#endif
+			    //vLcd_Flag_Clear();
+				//vLcd_String_Clear();
+
+				if(u1LeftOffset>0)
+				{
+					vLcd_Flag_Display(11,1);		//左移
+				}
+				else
+				{
+					vLcd_Flag_Display(11,0);
+				}
+				//if(u1RightOffset > 0)
+				//{
+				//	vLcd_Flag_Display(2,1);		//右移
+				//}
+
+				vLcd_Flag_Display(4,1);		//信息
+				if(InputCnt < SCREENLEN)
+				{
+					vLcd_String_Display(DispKeyPad, InputCnt);
+				}
+				else
+				{
+					vLcd_String_Display(DispKeyPad, SCREENLEN);
+				}
+#ifdef _FPGA_DEMO_EN_  
+				vLcd_SetDisplayMode();		
+#endif
+				break;
+			}
+			case KEY_LEFT:
+			{
+				if((u1LeftOffset > 0))
+				{
+					u1LeftOffset--;
+					u1RightOffset++;
+					for(i=0; i<SCREENLEN; i++)DispKeyPad[i] = u1Buffer[i + u1LeftOffset];
+
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();	 	
+#endif
+				    //vLcd_Flag_Clear();
+					//vLcd_String_Clear();
+
+					if(u1LeftOffset>0)
+					{
+						vLcd_Flag_Display(11,1);		//左移
+					}
+					else
+					{
+						vLcd_Flag_Display(11,0);
+					}
+					if(u1RightOffset > 0)
+					{
+						vLcd_Flag_Display(1,1);		//右移
+					}
+					else
+					{
+						vLcd_Flag_Display(1,0);
+					}
+
+					vLcd_Flag_Display(4,1);		//信息
+					vLcd_String_Display(DispKeyPad, SCREENLEN);
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif
+				}
+				break;
+			}
+			case KEY_RIGHT:
+			{
+				if((u1RightOffset > 0))
+				{
+					u1LeftOffset++;
+					u1RightOffset--;
+					for(i=0; i<SCREENLEN; i++)DispKeyPad[i] = u1Buffer[i + u1LeftOffset];
+
+#ifdef _FPGA_DEMO_EN_
+					vLcd_SetStopMode();	 	
+#endif
+				    //vLcd_Flag_Clear();
+					//vLcd_String_Clear();
+
+					if(u1LeftOffset>0)
+					{
+						vLcd_Flag_Display(11,1);		//左移
+					}
+					else
+					{
+						vLcd_Flag_Display(11,0);
+					}
+					if(u1RightOffset > 0)
+					{
+						vLcd_Flag_Display(1,1);		//右移
+					}
+					else
+					{
+						vLcd_Flag_Display(1,0);	
+					}
+
+					vLcd_Flag_Display(4,1);		//信息
+					vLcd_String_Display(DispKeyPad, SCREENLEN);
+#ifdef _FPGA_DEMO_EN_  
+					vLcd_SetDisplayMode();		
+#endif	
+				}
+
+				break;
+			}
+			case KEY_DEL:
+			{
+				if((InputCnt > 0)&&(u1RightOffset == 0))
+				{
+					if(LongPressFlag)
+					{
+						LongPressFlag = 0;
+						gUseCase = OTPSTATUS_SELECTMODE;
+						return;
+					}
+					
+					if(InputCnt <= SCREENLEN)
+					{
+						#if 0		//yuan
+						InputCnt--;
+						DispKeyPad[InputCnt] = 0x00;
+						u1Buffer[InputCnt] = 0x00;
+
+						if(EndFlag>0)EndFlag--;
+						if(0 == EndFlag)DotFlag =0;
+						#endif
+						InputCnt--;
+						if(EndFlag>0)
+						{
+							EndFlag--;
+							if(0 == EndFlag)
+							{
+								DotFlag =0;
+								DispKeyPad[InputCnt] -= DOT_OFFSET;
+								u1Buffer[InputCnt] -= DOT_OFFSET;
+								InputCnt++;
+							}
+							else
+							{
+								DispKeyPad[InputCnt] = 0x00;
+								u1Buffer[InputCnt] = 0x00;
+							}
+						}
+						else
+						{
+							DispKeyPad[InputCnt] = 0x00;
+							u1Buffer[InputCnt] = 0x00;
+						}
+
+#ifdef _FPGA_DEMO_EN_
+						vLcd_SetStopMode();	 	
+#endif
+					    //vLcd_Flag_Clear();
+						//vLcd_String_Clear();    
+
+						vLcd_Flag_Display(4,1);		//信息
+						vLcd_String_Display(DispKeyPad, InputCnt);
+						vLcd_Bcd_Clear(InputCnt);
+#ifdef _FPGA_DEMO_EN_  
+						vLcd_SetDisplayMode();		
+#endif
+					}
+					else
+					{
+						#if 0				//yuan
+						u1LeftOffset--;
+						InputCnt--;
+						u1Buffer[InputCnt] = 0x00;
+						for(i=0; i<SCREENLEN; i++)DispKeyPad[i] = u1Buffer[i + u1LeftOffset];
+
+						if(EndFlag>0)EndFlag--;
+						if(0 == EndFlag)DotFlag =0;
+						#endif
+
+						if(EndFlag>0)
+						{
+							EndFlag--;
+							if(0 == EndFlag)
+							{
+								DotFlag =0;
+								u1Buffer[InputCnt-1] -= DOT_OFFSET;
+								DispKeyPad[SCREENLEN-1] -= DOT_OFFSET;
+							}
+							else
+							{
+								u1LeftOffset--;
+								InputCnt--;
+								u1Buffer[InputCnt] = 0x00;
+								for(i=0; i<SCREENLEN; i++)DispKeyPad[i] = u1Buffer[i + u1LeftOffset];
+							}
+						}
+						else
+						{
+							u1LeftOffset--;
+							InputCnt--;
+							u1Buffer[InputCnt] = 0x00;
+							for(i=0; i<SCREENLEN; i++)DispKeyPad[i] = u1Buffer[i + u1LeftOffset];
+						}
+						
+						
+
+#ifdef _FPGA_DEMO_EN_
+						vLcd_SetStopMode();	 	
+#endif
+					    //vLcd_Flag_Clear();
+						//vLcd_String_Clear();
+
+						if(u1LeftOffset>0)
+						{
+							vLcd_Flag_Display(11,1);		//左移
+						}
+						else
+						{
+							vLcd_Flag_Display(11,0);
+						}
+
+						vLcd_Flag_Display(4,1);		//信息
+						vLcd_String_Display(DispKeyPad, SCREENLEN);
+#ifdef _FPGA_DEMO_EN_  
+						vLcd_SetDisplayMode();		
+#endif
+						
+					}
+				}
+
+				if(InputCnt == 0)
+				{
+					gUseCase = OTPSTATUS_SELECTMODE;
+					return;
+				}
+				break;
+			}
+			case KEY_DOT:
+			{
+				if((InputCnt> 0x00)&&(InputCnt < PAY_PARA_LEN - 2)&&(u1RightOffset == 0))
+				{
+					if(DotFlag == 0)
+					{
+						if(InputCnt<SCREENLEN)
+						{
+							DispKeyPad[InputCnt - 1] += 0x80;			//0x80为小数点
+						}
+						else
+						{
+							DispKeyPad[SCREENLEN - 1] += 0x80;
+						}
+						u1Buffer[InputCnt - 1] += DOT_OFFSET;
+
+						DotFlag = 1;
+						EndFlag++;
+					}
+#ifdef _FPGA_DEMO_EN_
+						vLcd_SetStopMode();	 	
+#endif
+					    //vLcd_Flag_Clear();
+						//vLcd_String_Clear();
+
+						if(u1LeftOffset>0)
+						{
+							vLcd_Flag_Display(11,1);		//左移
+						}
+						else
+						{
+							vLcd_Flag_Display(11,0);
+						}
+
+						vLcd_Flag_Display(4,1);		//信息
+						if(InputCnt < SCREENLEN)
+						{
+							vLcd_String_Display(DispKeyPad, InputCnt);
+						}
+						else
+						{
+							vLcd_String_Display(DispKeyPad, SCREENLEN);
+						}
+#ifdef _FPGA_DEMO_EN_  
+						vLcd_SetDisplayMode();		
+#endif
+				}
+				break;
+			}
+			case KEY_OK:
+			{
+				//if(0x03 == EndFlag)
+				{
+					if ( OTPSECU_OP_OK == CosOperation(OP_PAY_TOKEN, u1Buffer,InputCnt))
+					{
+						DotFlag =0x00;
+						EndFlag =0x00;
+						InputCnt=0x00;
+#ifdef _FPGA_DEMO_EN_
+						vLcd_SetStopMode();	 	
+#endif
+					    vLcd_Flag_Clear();
+						vLcd_String_Clear();
+
+						vLcd_String_Display(u1Buffer, 0x06);
+#ifdef _FPGA_DEMO_EN_  
+						vLcd_SetDisplayMode();		
+#endif
+						while(1)
+						{
+							Key_Input = ucGetKeyValue();	
+							if(Key_Input>=0x30 && Key_Input<=0x3f)
+							{
+								gUseCase = OTPSTATUS_SELECTMODE;
+								return;
+							}
+						}
+					}
+					else
+					{
+						DotFlag =0x00;
+						EndFlag =0x00;
+						InputCnt=0x00;
+
+						gUseCase = OTPSTATUS_SELECTMODE;
+#ifdef _FPGA_DEMO_EN_
+						vLcd_SetStopMode();	 	
+#endif
+					    vLcd_Flag_Clear();
+						vLcd_String_Clear();
+
+						vLcd_Flag_Display(2,1);			//错误
+#ifdef _FPGA_DEMO_EN_  
+						vLcd_SetDisplayMode();		
+#endif
+						vScu_TbcIntEn();
+						vTbc_Int1HzEn();
+						gSecCount_10S=0;
+						while(gSecCount_10S < 2);
+						vScu_TbcIntDis();
+						vTbc_Int1HzDis();
+					}
+				}
+				break;
+			}
+			default:
+				break;
+		}
+	}
+}
+/********************************************************************
+Function name:       void vOtp_ScrapProcess(void)
+Input parameters:
+    void  
+Return:
+    void
+Function:
+    OTP SCRAP PROCESS WHEN OTP UNLOCK TIME IN MANUAL PASSED SIX TIME	
+********************************************************************/
+void vOTP_InvalidProcess(void)
+{
+	u1 i;
+	//u4 Time_Temp;
+
+	//Time_Temp = TBC_COUNT_VALUE;
+
+	//DispKeyPad[0] = (u1)(Time_Temp>>24);
+	//DispKeyPad[1] = (u1)(Time_Temp>>16);
+	//DispKeyPad[2] = (u1)(Time_Temp>>8);
+	//DispKeyPad[3] = (u1)(Time_Temp);
+#ifdef _FPGA_DEMO_EN_
+	vLcd_SetStopMode();	 	
+#endif
+    vLcd_Flag_Clear();
+	//vLcd_String_Clear();
+	//if(u1LowPowerFlag == 1)
+	//{
+	//	vLcd_Flag_Display(10,1);//低电池电量标志
+	//}
+
+	for(i=0;i<16;i++)
+	{
+		vLcd_Flag_Display(i,1);	
+	}
+
+	vLcd_String_Display("Errorkkkkkkk",12);			//失效后设备显示Error
+	memset(gUserInfo,0x00,32);						//清除种子
+	memset(g_u1SeedKey,0x00,16);					//清除密钥
+	memset(g_u1MacKey,0x00,16);		
+#ifdef _FPGA_DEMO_EN_  
+	vLcd_SetDisplayMode();		
+#endif
+	while(1)
+	{
+		vScu_SuspendModeEn();
+	}
+}
+

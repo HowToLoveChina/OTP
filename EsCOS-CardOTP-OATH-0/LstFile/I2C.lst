@@ -1,0 +1,310 @@
+C51 COMPILER V9.01   I2C                                                                   11/23/2016 11:58:15 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE I2C
+OBJECT MODULE PLACED IN .\ObjFile\I2C.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE SrcFile\Func\I2C.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFile\Fram
+                    -e\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD_,_FPGA_DEMO_EN_) DEBUG OBJECTEXTEND PRINT(.\
+                    -LstFile\I2C.lst) OBJECT(.\ObjFile\I2C.obj)
+
+line level    source
+
+   1          /*----------------------------------------------------------------
+   2          Acess the M24LR04E
+   3          ----------------------------------------------------------------*/
+   4          #include "I2C.h"
+   5          #include <intrins.h> 
+   6          
+   7          void I2C_DELAY(void)
+   8          {
+   9   1              _nop_();_nop_();_nop_();_nop_();
+  10   1      }
+  11          //----------------------------------------------------------------
+  12          // delay 100us
+  13          //----------------------------------------------------------------
+  14          void mDelay(UINT8 k)
+  15          {
+  16   1              UINT16 i ;
+  17   1              
+  18   1              for(; k>0; k--)
+  19   1              {
+  20   2                      for(i=0; i<1993; i++);
+  21   2              }
+  22   1      }
+  23          //----------------------------------------------------------------
+  24          //OK
+  25          //----------------------------------------------------------------
+  26          void I2C_Start(void)
+  27          {
+  28   1              SDA_HIGH();
+  29   1              I2C_DELAY();    
+  30   1              
+  31   1              SCL_HIGH();
+  32   1              I2C_DELAY();
+  33   1              
+  34   1              SDA_LOW();
+  35   1              I2C_DELAY();    
+  36   1                      
+  37   1      }
+  38          //----------------------------------------------------------------
+  39          //OK
+  40          //----------------------------------------------------------------
+  41          void I2C_Stop(void)
+  42          {
+  43   1              SDA_LOW();
+  44   1              I2C_DELAY();
+  45   1              
+  46   1              SCL_HIGH();
+  47   1              I2C_DELAY();
+  48   1              
+  49   1              SDA_HIGH();
+  50   1              I2C_DELAY();
+  51   1      }
+  52          
+  53          //----------------------------------------------------------------
+C51 COMPILER V9.01   I2C                                                                   11/23/2016 11:58:15 PAGE 2   
+
+  54          //
+  55          //----------------------------------------------------------------
+  56          void sendNoAck(void)
+  57          {
+  58   1              SDA_HIGH();
+  59   1              I2C_DELAY();
+  60   1              
+  61   1              SCL_HIGH();
+  62   1              I2C_DELAY();
+  63   1              
+  64   1              SCL_LOW();
+  65   1              I2C_DELAY();            
+  66   1      }
+  67          //----------------------------------------------------------------
+  68          // 0 = noACK; 1 = ACK ;
+  69          //----------------------------------------------------------------
+  70          
+  71          UINT8 RecvACK(void)
+  72          {
+  73   1              UINT8 data_temp;
+  74   1      
+  75   1              SCL_LOW();      
+  76   1              _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();        
+  77   1              _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();                
+  78   1              SDA_InEn();
+  79   1        data_temp = IOMP1DIN&0x80;
+  80   1              
+  81   1              SCL_HIGH(); 
+  82   1              _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
+  83   1              _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
+  84   1              _nop_();_nop_();_nop_();_nop_();_nop_();        
+  85   1              SCL_LOW();   
+  86   1              _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();        
+  87   1              _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();        
+  88   1              _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
+  89   1              _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
+  90   1              _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();        
+  91   1              _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();        
+  92   1              _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();        
+  93   1              _nop_();_nop_();        
+  94   1              
+  95   1              SDA_OutEn();
+  96   1              
+  97   1        return data_temp;             
+  98   1      }
+  99          
+ 100          //----------------------------------------------------------------
+ 101          //OK
+ 102          // a positive clock edge clock a bit into the ROM
+ 103          //----------------------------------------------------------------
+ 104          void writeByte(UINT8 datum)
+ 105          {
+ 106   1              UINT8 bitCnt;
+ 107   1              
+ 108   1              for(bitCnt=0; bitCnt<8; bitCnt++)
+ 109   1              {               
+ 110   2                      SCL_LOW();
+ 111   2                      I2C_DELAY();
+ 112   2                      
+ 113   2                      if ((datum&0x80) == 0x80) //if the MSb is 1
+ 114   2                      {
+ 115   3                              SDA_HIGH();
+C51 COMPILER V9.01   I2C                                                                   11/23/2016 11:58:15 PAGE 3   
+
+ 116   3                      }
+ 117   2                      else
+ 118   2                      {
+ 119   3                              SDA_LOW();
+ 120   3                      }
+ 121   2                      I2C_DELAY();
+ 122   2                      
+ 123   2                      SCL_HIGH();
+ 124   2                      I2C_DELAY();
+ 125   2                _nop_();_nop_();_nop_();_nop_();_nop_();                      
+ 126   2                      
+ 127   2                      datum<<=1 ; 
+ 128   2              }       
+ 129   1              
+ 130   1              RecvACK();
+ 131   1      }
+ 132          
+ 133          void writeFourBytesToROM(UINT8 datum[], UINT16 address, UINT16 num)
+ 134          {
+ 135   1              UINT16 i;
+ 136   1              UINT8 *datum_P ;
+ 137   1              datum_P = datum ;
+ 138   1              
+ 139   1              I2C_Start() ;
+ 140   1              
+ 141   1              writeByte(M24LR04_EEPROM_ADDRESS_USER) ;
+ 142   1              
+ 143   1        writeByte((UINT8)(address >> 8)); // MSB 
+ 144   1              
+ 145   1              writeByte((UINT8)(address)); /*address*/        
+ 146   1              
+ 147   1              for(i=0; i<num; i++)
+ 148   1              {
+ 149   2                      writeByte(*(datum_P+i)) ;
+ 150   2                      
+ 151   2              }
+ 152   1              
+ 153   1              I2C_Stop() ;    
+ 154   1      }
+ 155          
+ 156          /*~~~~~~~~~~~~~~~~~~~~~~~ API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+ 157          /*-----------------------------------------------------------------
+ 158          write some bytes to sequential address
+ 159          TarAddr µØÖ·±ØÐë4µÄ±¶ÊýÇ
+ 160          -----------------------------------------------------------------*/
+ 161          void writeToROM(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
+ 162          {
+ 163   1              UINT8 align_mem_offset;
+ 164   1        UINT16 bytes_to_write = NbByte;
+ 165   1        UINT16 mem_addr = TarAddr;
+ 166   1        UINT8 *pdata_index = (UINT8 *)pData;  
+ 167   1              
+ 168   1        do
+ 169   1        {
+ 170   2          if( bytes_to_write > M24LR_PAGEWRITE_NBBYTE )
+ 171   2          {
+ 172   3            align_mem_offset = M24LR_PAGEWRITE_NBBYTE - (mem_addr % M24LR_PAGEWRITE_NBBYTE);
+ 173   3          }
+ 174   2          else
+ 175   2          {
+ 176   3            align_mem_offset = bytes_to_write;
+ 177   3          }
+C51 COMPILER V9.01   I2C                                                                   11/23/2016 11:58:15 PAGE 4   
+
+ 178   2          writeFourBytesToROM(pdata_index, mem_addr, align_mem_offset);
+ 179   2                      mDelay(10);
+ 180   2      
+ 181   2          pdata_index += align_mem_offset;
+ 182   2          mem_addr += align_mem_offset;
+ 183   2          bytes_to_write -= align_mem_offset;
+ 184   2                      
+ 185   2        }while(bytes_to_write > 0);           
+ 186   1      }
+ 187          
+ 188          /*-----------------------------------------------------------------
+ 189          read some bytes from ROM`s sequential address
+ 190          TarAddr µØÖ·±ØÐë4µÄ±¶Êý
+ 191          -----------------------------------------------------------------*/
+ 192          void readFromROM(UINT8 datum[], UINT16 address, UINT16 num)
+ 193          {
+ 194   1              UINT16 i;
+ 195   1              UINT8 *datum_P ;        
+ 196   1              
+ 197   1              UINT8 tempbit = 1 ;
+ 198   1              UINT8 temp = 0 ;
+ 199   1              UINT8 bitCnt ;
+ 200   1      
+ 201   1              datum_P = datum;
+ 202   1                              
+ 203   1              I2C_Start() ;
+ 204   1              
+ 205   1              writeByte(M24LR04_EEPROM_ADDRESS_USER);
+ 206   1              
+ 207   1              writeByte((UINT8)(address >> 8)); // MSB 
+ 208   1      
+ 209   1              writeByte((UINT8)address); /*address*/
+ 210   1              
+ 211   1              I2C_Start();
+ 212   1              writeByte(M24LR04_EEPROM_ADDRESS_USER+1);
+ 213   1              
+ 214   1              for(i=0; i<num; i++)
+ 215   1              {
+ 216   2      
+ 217   2                      SDA_HIGH(); // release the bus,ready to receive byte
+ 218   2                      
+ 219   2                      for(bitCnt=0; bitCnt<8; bitCnt++)
+ 220   2                      {
+ 221   3                              SCL_LOW(); 
+ 222   3                              _nop_();                        
+ 223   3                              
+ 224   3                              SDA_InEn();             //ÊäÈë          
+ 225   3                              tempbit = (IOMP1DIN&0x80); //SDA ;                              
+ 226   3                              SDA_OutEn();
+ 227   3                              
+ 228   3                              if (tempbit)
+ 229   3                                      temp |= 0x01 ;
+ 230   3                              else
+ 231   3                                      temp &= 0xfe ;
+ 232   3                              
+ 233   3                              SCL_HIGH();                             
+ 234   3                      
+ 235   3                              if(bitCnt<7)
+ 236   3                                      temp <<= 1 ;
+ 237   3                      
+ 238   3                      }
+ 239   2              
+C51 COMPILER V9.01   I2C                                                                   11/23/2016 11:58:15 PAGE 5   
+
+ 240   2                      _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();        
+ 241   2                      _nop_();_nop_();                
+ 242   2                      
+ 243   2                      SCL_LOW();              
+ 244   2                      
+ 245   2                      *(datum_P+i) = temp;
+ 246   2                      
+ 247   2                      SDA_LOW();
+ 248   2                      
+ 249   2                      SCL_HIGH();
+ 250   2                      _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();        
+ 251   2                      _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();        
+ 252   2                      _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();                
+ 253   2                      
+ 254   2                      SCL_LOW();
+ 255   2                      I2C_DELAY();            
+ 256   2              }
+ 257   1              sendNoAck() ;
+ 258   1              
+ 259   1              I2C_Stop() ;
+ 260   1      }
+ 261          
+ 262          /********************************************************************
+ 263          IIC Init
+ 264          ********************************************************************/
+ 265          void IIC_HostInit(void)
+ 266          {
+ 267   1              vScu_SetSysClkOsc2M();
+ 268   1              
+ 269   1              vScu_IomClkEn();
+ 270   1      
+ 271   1              SCL_OutEn();                    //GP14  
+ 272   1              SCL_PuEn();                             //ÉÏÀ­
+ 273   1      
+ 274   1              SDA_OutEn();                    //GP15
+ 275   1              SDA_PuEn();                             //ÉÏÀ­
+ 276   1      }
+ 277          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    685    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      37
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

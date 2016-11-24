@@ -1,0 +1,134 @@
+C51 COMPILER V9.00   RNGFUNC                                                               07/19/2016 17:02:34 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE RNGFUNC
+OBJECT MODULE PLACED IN .\ObjFile\RngFunc.obj
+COMPILER INVOKED BY: H:\Keil\C51\BIN\C51.EXE SrcFile\Func\RngFunc.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFile\
+                    -Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD_,_FPGA_DEMO_EN_) DEBUG OBJECTEXTEND PRIN
+                    -T(.\LstFile\RngFunc.lst) TABS(2) OBJECT(.\ObjFile\RngFunc.obj)
+
+line level    source
+
+   1          /********************************************************************
+   2                                    Nationz Co.,Ltd
+   3                  Copyright (c) 2009－2015 All Rights Reserved
+   4           ********************************************************************
+   5          File: RngFunc.c
+   6          History：
+   7          Version                      Author                     Date
+   8          V0.1                         nationz                  2013-04-2
+   9          
+  10          Description:
+  11               RngFunc Source Code File;
+  12          Function list:
+  13              void vRngStartInit(UINT8 IPMODE);
+  14              UINT8 ucGetRngByte(void);
+  15              void vRngData(UINT8 *OutData,UINT16 Len);        
+  16          Special statement:
+  17               NULL
+  18           *******************************************************************/
+  19          #define _RNGFUNC_C_
+  20          #include "RNGFUNC.h"
+  21          #include "SCUFUNC.h"
+  22          #include "ADCFUNC.h"
+  23          /********************************************************************
+  24          Function name:       vRngStartInit
+  25          Input parameters:
+  26              UINT8 IPMODE:RNG IP Select
+  27          Return:
+  28              void
+  29          Function:
+  30              Init Rng Module.
+  31          ********************************************************************/
+  32          void vRngStartInit(UINT8 IPMODE,UINT8 IPCLK)
+  33          {
+  34   1            vScu_AnactrlClkEn();  
+  35   1          vAdcBgEn();
+  36   1            //配置RNG IP 时钟前需开启2M时钟
+  37   1            vScu_Osc2MEn();
+  38   1          vScu_RngcClkEn();
+  39   1          //配置RNG IP时钟前，需要关闭
+  40   1          vRng_IpDis();  
+  41   1        
+  42   1          SCURNGC&=RNGCLKSELMASK;
+  43   1          SCURNGC|=(IPCLK&(~RNGCLKSELMASK));
+  44   1           
+  45   1          RNGMODE=IPMODE;
+  46   1          vRng_IpEn();
+  47   1         //vRng_Start();
+  48   1      }
+  49          /********************************************************************
+  50          Function name:       ucGetRngByte
+  51          Input parameters:
+  52              void
+  53          Return:
+C51 COMPILER V9.00   RNGFUNC                                                               07/19/2016 17:02:34 PAGE 2   
+
+  54              UINT8 :RNG DATA
+  55          Function:
+  56              Get One Byte Rng Data.
+  57          ********************************************************************/
+  58          UINT8 ucGetRngByte(void)
+  59          {
+  60   1         vRng_Start();
+  61   1         while(RNGSTART&0x01);
+  62   1         if(RNGINT&0x01)
+  63   1         {
+  64   2             RNGINT|=0x01;
+  65   2         }
+  66   1         return ((UINT8)RNGDATA);
+  67   1      }
+  68          /********************************************************************
+  69          Function name:       vRngData
+  70          Input parameters:
+  71              UINT8 *OutData: Rng Data Saved Buffer
+  72            UINT16 Len: Length of Rng Data you want to Get
+  73          Return:
+  74              void
+  75          Function:
+  76              Get the Specify Length of Rng Data.
+  77          ********************************************************************/
+  78          void vRngData(UINT8 *OutData,UINT16 Len)
+  79          {
+  80   1           //UINT16 TmpLen;
+  81   1         //TmpLen =Len;
+  82   1         while(Len--)
+  83   1         {
+  84   2           vRng_Start();
+  85   2             while(RNGSTART&0x01);
+  86   2           RNGINT|=0x01;
+  87   2           *OutData++=RNGDATA;
+  88   2         }
+  89   1      
+  90   1      }
+  91          /********************************************************************
+  92          Function name:       void vRngClose(void)
+  93          Input parameters:
+  94              void
+  95          Return:
+  96              void
+  97          Function:
+  98              Close Rng Module
+  99          ********************************************************************/
+ 100          void vRngClose(void)
+ 101          {
+ 102   1         //vScu_Osc2MDis();
+ 103   1         vRng_IpDis();
+ 104   1         vScu_RngcClkDis();    
+ 105   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    115    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       3
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+C51 COMPILER V9.00   RNGFUNC                                                               07/19/2016 17:02:34 PAGE 3   
+
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

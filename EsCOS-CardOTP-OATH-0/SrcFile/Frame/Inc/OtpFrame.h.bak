@@ -1,0 +1,69 @@
+//#ifndef _OTPFRAME_H_
+#define _OTPFRMAE_H_
+#include "REG_Z8D16R_2.h"
+
+//12小时自动解锁
+#define _UNLOCK_TIME_CONST_  3600UL
+#define _DYNDISP_NUM_   8U
+
+#define	SEEDKEY_LEN						16//PIN长度（Bytes）
+#define	SEED_LEN					32//种子长度（Bytes）
+#define MACKEY_LEN                     16 
+#define KEY_LEN                     16
+#define SN_LEN                      10
+#define PW_SM_LEN                       16
+#define TIME_LEN                    8   //时间因子长度  
+#define AC_LEN              		12   //激活码长度
+#define PW_LEN                      6
+#define PWLOCK_LIMITED				6
+#define SCREENLEN					12		//13
+#define PAY_PARA_LEN                 40
+
+#define BASE_2011MINUTES             21563520uL //即BASE_MINUTES_2011,stm8编译器用BASE_MINUTES_2011会溢出，故直接赋值
+
+
+//extern UINT8  g_UART_COM_BUF[64];
+extern u1 u1LowPowerFlag;
+extern u1 LongPressFlag; 
+extern UINT8 idata g_ModfyPwFlag;
+extern UINT8 volatile gSecCount_10S,gFlag_1S; 
+//extern UINT8 bOpenHash,bCloseLCD,bAlwaysbdisplay;
+extern UINT8 idata gUnlockPinErr_Count;
+extern UINT8 idata gsuperpw; 
+extern UINT8 idata gUseCase;
+//extern UINT8 gCursor_Flag;//gCursor_Count;
+extern UINT8 idata gPinErr_Count ;
+//extern UINT8 idata gPinErr_6TimeFlag;
+extern UINT8 idata gUserInfo[32];			//种子
+extern UINT8 idata gPin_Save[PW_SM_LEN];
+extern UINT32 idata gTimer_Count_Base,gPinErr_Time;
+//extern UINT8 gPin_Key[8];
+//extern UINT8 gErr[8];  
+extern UINT8 idata g_u1SeedKey[SEEDKEY_LEN];		//seedkey
+extern UINT8 idata g_u1MacKey[MACKEY_LEN];		//MACkey
+extern UINT8 idata g_u1Key[KEY_LEN];              //u1KEY
+extern UINT8 idata g_u1SN[SN_LEN];              //序列号
+
+extern UINT8 g_AutoUnlockFlag;
+extern UINT8 idata g_AutoUnlockCnt;
+extern UINT8 idata gCalibflag;
+extern UINT8 idata PowerOnFlag;
+
+extern void vOTP_RunModeProcess(void);
+extern void vOTP_UnlockPinProcess(void);
+extern void vOTP_SetPinProcess(void);
+extern void vOTP_InputPinProcess(void);
+extern void vOTP_ActiveProcess(void);
+//extern void vOTP_SeedImportProcess(void);
+extern void vOTP_InvalidProcess(void);
+extern void vOTP_InputSN_Time(void);
+extern void vOTP_CRC_SN_TIME(void);
+//extern void vOTP_Ewatch(void);
+extern void vOTP_KEY_CHECK(void);
+extern void vOTP_InputMacKey_SeedKey(void);
+extern void vOTP_InputHardware_Check(void);
+extern void VOTP_TimeToken(void);
+extern void vOTP_PAYProcess(void);
+extern void vOTP_KEY_CALIB(void);
+
+//#endif

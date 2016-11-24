@@ -1,0 +1,61 @@
+C51 COMPILER V9.00   SCUFRAME                                                              03/24/2015 09:28:31 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE SCUFRAME
+OBJECT MODULE PLACED IN .\ObjFile\ScuFrame.obj
+COMPILER INVOKED BY: H:\Keil\C51\BIN\C51.EXE SrcFile\Frame\ScuFrame.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFil
+                    -e\Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD_) DEBUG OBJECTEXTEND PRINT(.\LstFile\S
+                    -cuFrame.lst) OBJECT(.\ObjFile\ScuFrame.obj)
+
+line level    source
+
+   1          #define _SCURAME_C_     
+   2          #include "SCUFRAME.H"
+   3          #include "SCUFUNC.H"
+   4          #include "TbcFUNC.H"
+   5          #include "IOMFUNC.H"
+   6          #include "string.H"
+   7          #include "LCDFUNC.H"
+   8          
+   9          #include "Debug.H"
+  10          
+  11          UINT8 xdata TestBuf[2048] _at_ 0x0380;
+  12          
+  13          UINT8 xdata TestBuf1K[512] _at_ 0x0000;
+  14          
+  15          unsigned char bdata CharData[10] _at_ 0x20;
+  16          
+  17          
+  18          void vScuVerify(void) 
+  19          {
+  20   1      
+  21   1          DebugPrintf("Call Function:vScuVerify() in File:(%s),Line:%d,\r\n", __FILE__,(UINT16)__LINE__);
+  22   1              switch(CMD_INS)
+  23   1              {
+  24   2                       case 0x00:       //01 00 00 00 00                                
+  25   2                                          
+  26   2                    break;
+  27   2                        
+  28   2                       default:
+  29   2                            vScu_StorageModeEn();
+  30   2                            break;
+  31   2              }
+  32   1              DebugPrintf("************Excute CMD_INS:%02bx Over************\r\n",CMD_INS);
+  33   1      }
+  34          
+  35          
+  36          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     62    ----
+   CONSTANT SIZE    =    128    ----
+   XDATA SIZE       =      4    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

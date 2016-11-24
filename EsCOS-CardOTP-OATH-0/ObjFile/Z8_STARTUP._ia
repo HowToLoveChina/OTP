@@ -1,0 +1,1 @@
+"SrcFile\StartUp\Z8_STARTUP.A51" SET (LARGE) DEBUG PRINT(.\LstFile\Z8_STARTUP.lst) OBJECT(.\ObjFile\Z8_STARTUP.obj) EP

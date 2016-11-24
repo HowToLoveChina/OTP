@@ -1,0 +1,30 @@
+".\ObjFile\Z8_STARTUP.obj",
+".\ObjFile\Main.obj",
+".\ObjFile\HardApiAsm.obj",
+".\ObjFile\TbcFunc.obj",
+".\ObjFile\OtpFunc.obj",
+".\ObjFile\LcdFunc.obj",
+".\ObjFile\AdcFunc.obj",
+".\ObjFile\ScuFunc.obj",
+".\ObjFile\UartFunc.obj",
+".\ObjFile\TimerFunc.obj",
+".\ObjFile\WdtFunc.obj",
+".\ObjFile\Hmac.obj",
+".\ObjFile\Sha1.obj",
+".\ObjFile\I2C.obj",
+".\ObjFile\Uc8118.obj",
+".\ObjFile\IsrFrame.obj",
+".\ObjFile\OtpFrame.obj",
+".\ObjFile\AdcFrame.obj",
+".\ObjFile\SM4Process.obj",
+".\ObjFile\UartFrame.obj",
+".\ObjFile\PUTCHAR.obj",
+".\ObjFile\Debug.obj",
+".\ObjFile\Crc.obj",
+".\SrcFile\Lib\Z8D16R_SM4_L_V1.0.LIB",
+".\ObjFile\BigApiAsm.obj" 
+TO ".\ObjFile\Z8D16R_2" 
+PRINT(".\LstFile\Z8D16R_2.m51") RAMSIZE(256) 
+DISABLEWARNING (16) 
+CODE( 0X0000-0XBFFF )
+XDATA( 0X0000-0X0BFF )

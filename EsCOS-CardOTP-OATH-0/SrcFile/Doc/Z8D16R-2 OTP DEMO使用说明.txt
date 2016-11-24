@@ -1,0 +1,29 @@
+1.FPGA 仿真器/芯片上使用说明：
+  A、因在仿真器上，顶板上的LCD屏的驱动是通过HT1621芯片来实现，LCD的操作流程与实际芯片存在区别，必须使能_FPGA_DEMO_EN_ ；
+  B、当客户在仿真器上调试完代码后，移植到芯片上测试时，只需要将_FPGA_DEMO_EN_宏换成_DEV_BOARD_即可；
+  C、OTP DEOM支持UART中断方式以及查询方式导入种子密钥，默认情况下采用查询方式，若客户想采用中断方式，必须使能_UART_INTER_EN_；
+  D、OTP DEMO仅支持GPIO方式的键盘，默认情况下采用GPIO方式的键盘；
+  E、客户如果需要使用UART的打印调试信息，需使能_Debug_，然后添加Debug.h头文件，即可使用DebugPrintf、DebugPrintBuf两个函数，其中：
+     DebugPrintf是printf函数的宏，用法与printf函数一样；DebugPrintBuf宏可以实现BUF的打印；
+	 
+  F、仿真器仿真单步调试时，如果出现“Target Lost”提示时，请将代码当中vScu_SuspendModeEn（）函数屏蔽，全速运行和下载到开发板上时，请打开；
+  
+2.Z8D16R OTP DEMO演示功能说明：
+  A、DEMO中TokenApp.c中实现OTP的基本流程：包括种子导入、激活、PIN码输入（设置和开机校验）、锁定/解锁（手动与自动）、时间型令牌以及挑战码令牌，
+     请注意种子导入中只是简单的从串口导入数据，DEMO中并没有做密钥变形机制，因此后面的激活码与解锁码，DEMO中都采用了固定的激活码和解锁码；
+  B、DEMO中xxxFrame.c中实现了功耗测试、LCD显示、RNG测试、TBC、ADC、TIMER/WDT、UART等模块的基本功能的演示，用户可通过按键输入相应的测试命令，
+     来简单的测试相应模块的功能检测；
+  C、CmdProc.c文件是模块基本功能命令处理调用，用户可以自行添加相应的测试命令；
+
+3.SM3算法使用说明：
+  A、DEMO中SM3算法vSm3Hash，此函数为OTP专用，用户需要将参数与结果0x0B80以上的算法区域 
+函数内部不对参数进行判断，因此只支持小于64byte的数据包的HASH运算；
+  B、DEMO中消息BUF和参数BUF定义为：
+     UINT8 xdata DynBuf[32] _at_ 0x0B80; 
+     UINT8 xdata MessBuf[64] _at_ 0x0BA0;
+  C、该接口只适用单个分组（64Byte）的消息求哈希值；
+  D、调用该接口前需将填充好的消息（64Byte）写入SM3_MSG_BASE（MessBuf[64] _at_ 0x0BA0）地址处；
+  E、调用该接口后，从SM3_A_BASE地址处读取32Byte（DynBuf[32] _at_ 0x0380）哈希值；
+  F、消息填充规则简述：假设消息m 的长度为L 比特。首先将比特“1”添加到消息的末尾，再添加k 个“0”，k是满足L + 1 + k < 448mod512 的最小的非负整数。
+  然后再添加一个64位比特串，该比特串是长度L的二进制表示。填充后的消息m′的比特长度为512的倍数。
+  

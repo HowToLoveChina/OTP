@@ -1,0 +1,150 @@
+C51 COMPILER V9.01   ADCFRAME                                                              11/23/2016 11:58:15 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE ADCFRAME
+OBJECT MODULE PLACED IN .\ObjFile\AdcFrame.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE SrcFile\Frame\AdcFrame.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFil
+                    -e\Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD_,_FPGA_DEMO_EN_) DEBUG OBJECTEXTEND PR
+                    -INT(.\LstFile\AdcFrame.lst) OBJECT(.\ObjFile\AdcFrame.obj)
+
+line level    source
+
+   1          /********************************************************************
+   2                                    Nationz Co.,Ltd
+   3                  Copyright (c) 2009－2015 All Rights Reserved
+   4           ********************************************************************
+   5          File: AdcFunc.c
+   6          History：
+   7          Version                      Author                     Date
+   8          V0.1                         nationz              2013-10-10
+   9          
+  10          Description:
+  11               SecFunc Source Code File;
+  12          Function list:
+  13              UINT8 ucPowerDetect(void)        
+  14          Special statement:
+  15               NULL
+  16           *******************************************************************/
+  17          #define _ADCFRAME_C_
+  18          #include "ADCFRAME.h"
+  19          #include "OTPFUNC.h"
+  20          #include "DEBUG.H"
+  21          #include "UARTFRAME.H"
+  22          #include "UARTFUNC.H"
+  23          
+  24          UINT8 ucPowerDetect(void)
+  25          {
+  26   1           UINT16 TmpVal;
+  27   1               float Vol;
+  28   1               vAdcInit(CH_VDD);
+  29   1               TmpVal=uiAdc_GetData();
+  30   1               TmpVal=uiAdc_GetData();
+  31   1               vAdcClose();
+  32   1               Vol=((TmpVal*9)>>8)/10.0;
+  33   1               if(Vol<=2.6)
+  34   1               {
+  35   2                        return 1;
+  36   2               }
+  37   1               else
+  38   1               {
+  39   2                        return 0;
+  40   2               }
+  41   1      
+  42   1      }
+  43          
+  44          #if 0
+              void vAdcVerify(void)
+              {
+              #if 1
+                 UINT8 i=10;
+                 UINT16 TmpVal,ADJVAL;
+                 float Tmp;
+                 DebugPrintf("Call Function:vAdcVerify() in File:(%s),Line:%d,\r\n", __FILE__,(UINT16)__LINE__);
+                 switch(CMD_INS-0x30)
+                 {
+C51 COMPILER V9.01   ADCFRAME                                                              11/23/2016 11:58:15 PAGE 2   
+
+                         case 0x00:
+                              vAdcInit(CH_VDD);
+                              break;
+                         case 0x01:
+                              vAdcInit(CH_TEMP);
+                              //开温度检测使能
+                              vAdcTsEn();
+                                      break;
+                         case 0x02:
+                              vAdcInit(CH_GPIO);
+                              break;
+                         case 0x03:
+                                      vAdcInit(CH_TEMP);
+                              //开温度检测使能
+                              vAdcTsEn();
+                                      do{
+                                        TmpVal=uiAdc_GetData();
+                                                TmpVal=uiAdc_GetData();
+              
+                                                ADJVAL=_TSADJ_VAL_;
+              
+                                                //ADJVAL=0x316;//测试用
+                                                //vTimer_Counter_Disp((UINT32)TmpVal); 
+                                                DebugPrintf("ADJVAL=%#x\r\n",ADJVAL);
+                                                DebugPrintf("TmpVal=%#x\r\n",TmpVal);
+              
+                                                Tmp=30.0+(((float)ADJVAL-TmpVal)*0.5247);                                       
+                                                
+                                                //vFloat_Disp(Tmp);
+                                                DebugPrintf("uiAdc_GetData111=%08.2f\r\n",Tmp);
+                 
+                             }while(1); 
+                                      break;
+                              case 0x04:
+                                      vAdcInit(CH_VDD);
+                                      do{
+                                            //vScu_SetSysClkOsc2M();
+                                            TmpVal=uiAdc_GetData();
+                                //vTimer_Counter_Disp((UINT32)TmpVal);
+              
+                                                vScu_SetSysClk32K();
+                                                DebugPrintf("uiAdc_GetData111=%#x\r\n",TmpVal);
+                                                DebugPrintf("ANALOGCTRLSDLR=0x%02bx\r\n",ANALOGCTRLSDLR);
+                                                DebugPrintf("ANALOGCTRLSDHR=0x%02bx\r\n",ANALOGCTRLSDHR);
+                                                
+                 
+                             }while(1);
+                                       break;                 
+              
+                         default:
+                              
+                                      break;
+                 
+                 }
+                 do{
+                      
+                              TmpVal=uiAdc_GetData();
+                      //vTimer_Counter_Disp((UINT32)TmpVal);  
+                              DebugPrintf("uiAdc_GetData222=%#x\r\n",TmpVal);
+                 }while(i--); 
+              
+                 vAdcClose();
+C51 COMPILER V9.01   ADCFRAME                                                              11/23/2016 11:58:15 PAGE 3   
+
+              
+                      
+              #endif
+                      DebugPrintf("************Excute CMD_INS:%02bx Over************\r\n",CMD_INS);
+              }
+              #endif
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    102    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       6
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

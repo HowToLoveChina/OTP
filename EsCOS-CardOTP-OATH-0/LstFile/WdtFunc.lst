@@ -1,0 +1,85 @@
+C51 COMPILER V9.01   WDTFUNC                                                               11/23/2016 11:58:15 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE WDTFUNC
+OBJECT MODULE PLACED IN .\ObjFile\WdtFunc.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE SrcFile\Func\WdtFunc.c LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFile\
+                    -Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE(_DEV_BOARD_,_FPGA_DEMO_EN_) DEBUG OBJECTEXTEND PRIN
+                    -T(.\LstFile\WdtFunc.lst) OBJECT(.\ObjFile\WdtFunc.obj)
+
+line level    source
+
+   1          /********************************************************************
+   2                                    Nationz Co.,Ltd
+   3                  Copyright (c) 2009£­2015 All Rights Reserved
+   4           ********************************************************************
+   5          File: WdtFunc.c
+   6          History£º
+   7          Version                      Author                     Date
+   8          V0.1                         nationz              2013-03-27
+   9          
+  10          Description:
+  11               WdtFunc Source Code File;
+  12          Function list:
+  13               void WdtInit(UINT8 InitTimer)£»        
+  14          Special statement:
+  15               NULL
+  16           *******************************************************************/
+  17          #define _WDTFUNC_C_
+  18          #include "WDTFUNC.H"
+  19          #include "SCUFUNC.H"
+  20          /********************************************************************
+  21          Function name:       WdtInit
+  22          Input parameters:
+  23              UINT8 InitTimer£ºInit Time Value
+  24                  OPT VALUE:
+  25                      WDT_8S/WDT_2S/WDT_125MS/WDT_500MS
+  26                   
+  27          Return:
+  28              void
+  29          Function:
+  30              Enable WDT Module.
+  31          ********************************************************************/
+  32          void vWdtInit(UINT8 InitTimer)
+  33          {       
+  34   1           vScu_WdtClkEn();
+  35   1           WDTCON=0x5a;
+  36   1               WDTCON=0xa5;
+  37   1               WDTMOD=InitTimer;
+  38   1      }
+  39          /********************************************************************
+  40          Function name:       void vClrWdtCounter(void)
+  41          Input parameters:
+  42              void
+  43                   
+  44          Return:
+  45              void
+  46          Function:
+  47              Clear Wdt Counter when Wdt Overflow 
+  48          ********************************************************************/
+  49          void vClrWdtCounter(void)
+  50          {
+  51   1              do{
+  52   2                      WDTCON = 0x55;   // WDP: ->0  
+  53   2              }while(WDTCON&0x01);
+C51 COMPILER V9.01   WDTFUNC                                                               11/23/2016 11:58:15 PAGE 2   
+
+  54   1      
+  55   1              WDTCON = 0x5A;          // WDP : 1 -> 0 
+  56   1              WDTCON = 0xA5;          // WDP : 0 -> 1
+  57   1      }
+  58          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     27    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
