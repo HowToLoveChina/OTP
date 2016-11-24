@@ -1,2 +1,4 @@
 *.lst
 *.obj
+/EsCOS-CardOTP-OATH-0/ObjFile/*
+/EsCOS-CardOTP-OATH-0/LstFile/*
