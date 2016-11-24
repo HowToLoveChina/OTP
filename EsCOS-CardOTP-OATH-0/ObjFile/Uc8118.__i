@@ -1,1 +1,0 @@
-"SrcFile\Func\Uc8118.c" LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFile\Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE (_DEV_BOARD_,_FPGA_DEMO_EN_) DEBUG OBJECTEXTEND PRINT(.\LstFile\Uc8118.lst) OBJECT(.\ObjFile\Uc8118.obj)
