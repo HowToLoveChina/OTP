@@ -682,6 +682,7 @@ void vOTP_InitProcess(void)
 	UINT8 u1CHeckStatus;
 	UINT8 u1Datum[64];
 //	UINT16 E2prom_Address;
+
 	u2 u2PPM_Value;
 	
 
@@ -719,24 +720,18 @@ void vOTP_InitProcess(void)
 //	IOMP0PU   |= 0x01;		//GP0´ò¿ªÉÏÀ²
 	
 //	vScu_SetSysClk64K();		//9600_test
-//	vUartInit();
+//	vUartInit();				//change Uart to NFC
+
+	IIC_HostInit(); 		//Add IIC init colin 2016/11/24
+
 	vIom_LsclkOutEn();
+			
 
 	while(1)
 	{
 		//u2Status = ReceiveData_Poll();
 		readFromROM(u1Datum, EEPROM_ADDRESS, FRAME_LENGTH);
-		
-		if( FRAME_HEAD == u1Datum[0] )
-		{
-				
-		}
-		else
-		{
-				
-		}
-		
-		
+
 
 		if(u2Status == RSP_SET_SUCCESS)
 		{

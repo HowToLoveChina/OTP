@@ -30,6 +30,7 @@ Special statement:
 #include "TimerFunc.h"
 #include "LcdFunc.h"
 #include "TBCFUNC.H"
+#include "I2C.h"
 
 //u1  g_UART_COM_BUF[64];
 u1 ReceiveCompleteFlag;
@@ -377,6 +378,7 @@ void vUartRecvData(UINT8 xdata *InData,UINT16 Len)
 }
 #endif
 
+#if 0					// Use Uart
 u2 ReceiveData_Poll(void)					//用TBC来做超时
 {
 	u1 i;
@@ -513,7 +515,61 @@ u2 ReceiveData_Poll(void)					//用TBC来做超时
 #endif
 
 }
+#else
+u2 ReceiveData_Poll(void)					//Use NFC 
+{
+	u1 u1MacChk;
+	u1 u1RevDataFlag;
+	u2 u2Status;
+	u1	pu1IV[16];
+	u2	u2Len;
+	u1 pu1MacKey[16];
+	u1 u1Index;
+	u1 i;
+	//u1 u1ReceData;
 
+	memset(g_UART_COM_BUF, 0x00, FRAME_LENGTH);
+
+	readFromROM(g_UART_COM_BUF, EEPROM_ADDRESS, FRAME_LENGTH);
+	
+	u1Index = 0;
+	u1RevDataFlag = 0;
+	while((u1Index < HEAD_LEN))
+	{
+		if( FRAME_HEAD != g_UART_COM_BUF[u1Index++] )
+		{			
+			return RSP_DATA_ERR;
+		}
+	}
+
+//	if(u1Index == i)return RSP_DATA_ERR;				//防止数据传错
+
+	u1MacChk = 0;
+	for(i=0;i<16;i++) pu1MacKey[i] =g_u1PriKey[i];	
+	memset(pu1IV, 0x00, 0x10);
+	u2Len = g_UART_COM_BUF[OFFSET_LEN + u1Index]+OP_HEAD_LEN;
+	AlgSymmMacFun2(&g_UART_COM_BUF[u1Index], &u2Len, pu1MacKey,pu1IV);
+	u2Len = g_UART_COM_BUF[OFFSET_LEN + u1Index]+OP_HEAD_LEN;
+	if (0 != memcmp(g_UART_COM_BUF+u2Len+u1Index,pu1IV,4)) u1MacChk =0x01;
+
+	if(u1MacChk)
+	{
+		u2Status =RSP_CHK_FAIL;
+	}
+	else
+	{
+		u2Status =RSP_SET_SUCCESS;
+		for(i = 0; i< u2Len+4; i++)
+		{
+			g_UART_COM_BUF[i] = g_UART_COM_BUF[i+u1Index];
+		}
+	}
+
+	return u2Status;
+
+}
+
+#endif
 
 
 void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
