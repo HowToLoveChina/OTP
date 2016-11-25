@@ -110,7 +110,6 @@
         <tRmem>0</tRmem>
         <tRfunc>0</tRfunc>
         <tRbox>0</tRbox>
-        <tRtrace>0</tRtrace>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <nTsel>0</nTsel>
@@ -138,7 +137,6 @@
           <Name>-S4 -B115200 -O31</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -146,9 +144,6 @@
           <ItemText>pu1O</ItemText>
         </Ww>
       </WatchWindow1>
-      <Tracepoint>
-        <THDelay>0</THDelay>
-      </Tracepoint>
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
@@ -185,7 +180,6 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>1</FileNumber>
@@ -199,8 +193,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\StartUp\Z8_STARTUP.A51</PathWithFileName>
       <FilenameWithoutPath>Z8_STARTUP.A51</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -208,15 +200,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>27</ColumnNumber>
+      <ColumnNumber>7</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>271</TopLine>
-      <CurrentLine>276</CurrentLine>
+      <TopLine>241</TopLine>
+      <CurrentLine>241</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\StartUp\Main.c</PathWithFileName>
       <FilenameWithoutPath>Main.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -231,8 +221,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\StartUp\CPU\HardApiAsm.a51</PathWithFileName>
       <FilenameWithoutPath>HardApiAsm.a51</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -241,7 +229,6 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>2</GroupNumber>
       <FileNumber>4</FileNumber>
@@ -255,8 +242,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\TbcFunc.c</PathWithFileName>
       <FilenameWithoutPath>TbcFunc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -271,8 +256,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\OtpFunc.c</PathWithFileName>
       <FilenameWithoutPath>OtpFunc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -287,8 +270,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\LcdFunc.c</PathWithFileName>
       <FilenameWithoutPath>LcdFunc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -303,8 +284,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\AdcFunc.c</PathWithFileName>
       <FilenameWithoutPath>AdcFunc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -319,8 +298,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\ScuFunc.c</PathWithFileName>
       <FilenameWithoutPath>ScuFunc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -335,8 +312,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\UartFunc.c</PathWithFileName>
       <FilenameWithoutPath>UartFunc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -351,8 +326,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\TimerFunc.c</PathWithFileName>
       <FilenameWithoutPath>TimerFunc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -367,8 +340,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\WdtFunc.c</PathWithFileName>
       <FilenameWithoutPath>WdtFunc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -383,8 +354,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\Hmac.c</PathWithFileName>
       <FilenameWithoutPath>Hmac.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -399,8 +368,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\Sha1.c</PathWithFileName>
       <FilenameWithoutPath>Sha1.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -415,8 +382,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\I2C.c</PathWithFileName>
       <FilenameWithoutPath>I2C.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -431,8 +396,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\Uc8118.c</PathWithFileName>
       <FilenameWithoutPath>Uc8118.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -441,7 +404,6 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>16</FileNumber>
@@ -455,8 +417,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\IsrFrame.c</PathWithFileName>
       <FilenameWithoutPath>IsrFrame.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -471,8 +431,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\OtpFrame.c</PathWithFileName>
       <FilenameWithoutPath>OtpFrame.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -487,8 +445,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\AdcFrame.c</PathWithFileName>
       <FilenameWithoutPath>AdcFrame.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -503,8 +459,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\SM4Process.c</PathWithFileName>
       <FilenameWithoutPath>SM4Process.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -519,8 +473,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\UartFrame.c</PathWithFileName>
       <FilenameWithoutPath>UartFrame.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -529,7 +481,6 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
   </Group>
 
   <Group>
@@ -537,7 +488,6 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>5</GroupNumber>
       <FileNumber>21</FileNumber>
@@ -551,8 +501,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Lib\PUTCHAR.c</PathWithFileName>
       <FilenameWithoutPath>PUTCHAR.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -567,8 +515,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Lib\Debug.c</PathWithFileName>
       <FilenameWithoutPath>Debug.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -583,8 +529,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Lib\Crc.c</PathWithFileName>
       <FilenameWithoutPath>Crc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -599,8 +543,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Lib\Z8D16R_SM4_L_V1.0.LIB</PathWithFileName>
       <FilenameWithoutPath>Z8D16R_SM4_L_V1.0.LIB</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -615,8 +557,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Lib\BigApiAsm.a51</PathWithFileName>
       <FilenameWithoutPath>BigApiAsm.a51</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -625,7 +565,6 @@
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>6</GroupNumber>
       <FileNumber>26</FileNumber>
@@ -639,8 +578,6 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Doc\Z8D16R-2 OTP DEMO使用说明.txt</PathWithFileName>
       <FilenameWithoutPath>Z8D16R-2 OTP DEMO使用说明.txt</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
     </File>
   </Group>
 
