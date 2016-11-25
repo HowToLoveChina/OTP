@@ -1,7 +1,13 @@
 *.lst
 *.obj
 *.bak
+<<<<<<< HEAD
 *.PS
 /EsCOS-CardOTP-OATH-0/ObjFile/*
 /EsCOS-CardOTP-OATH-0/LstFile/*
 /EsCOS-CardOTP-OATH-0/SI/*
+=======
+EsCOS-CardOTP-OATH-0/ObjFile/*
+EsCOS-CardOTP-OATH-0/LstFile/*
+EsCOS-CardOTP-OATH-0/SI/*
+>>>>>>> Have_SI
