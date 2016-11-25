@@ -30,11 +30,14 @@ Special statement:
 #include "TimerFunc.h"
 #include "LcdFunc.h"
 #include "TBCFUNC.H"
+#include "I2C.h"
 
 //u1  g_UART_COM_BUF[64];
 u1 ReceiveCompleteFlag;
 //u1 UARTBufferIndex;
-u1 u1UsartBuffer[50];
+//u1 u1UsartBuffer[50];
+u1 u1UsartBuffer[64];
+
 
 const	u1	code AText[]	={"OCRA-1:HOTP-SHA1-8:QA16-PSHA1-T1M"};
 const   u1  code g_u1PriKey[16] = {0x53,0x66,0x47,0xcf,0x5a,0xb0,0x51,0x1d,0x81,0x03,0xfe,0xe9,0x74,0x5f,0x17,0x34};
@@ -377,6 +380,7 @@ void vUartRecvData(UINT8 xdata *InData,UINT16 Len)
 }
 #endif
 
+#if 0					// Use Uart
 u2 ReceiveData_Poll(void)					//用TBC来做超时
 {
 	u1 i;
@@ -513,7 +517,61 @@ u2 ReceiveData_Poll(void)					//用TBC来做超时
 #endif
 
 }
+#else
+u2 ReceiveData_Poll(void)					//Use NFC 
+{
+	u1 u1MacChk;
+	u1 u1RevDataFlag;
+	u2 u2Status;
+	u1	pu1IV[16];
+	u2	u2Len;
+	u1 pu1MacKey[16];
+	u1 u1Index;
+	u1 i;
+	//u1 u1ReceData;
 
+	memset(g_UART_COM_BUF, 0x00, FRAME_LENGTH);
+
+	readFromROM(g_UART_COM_BUF, EEPROM_ADDRESS, FRAME_LENGTH);
+	
+	u1Index = 0;
+	u1RevDataFlag = 0;
+	while((u1Index < HEAD_LEN))
+	{
+		if( FRAME_HEAD != g_UART_COM_BUF[u1Index++] )
+		{			
+			return RSP_DATA_ERR;
+		}
+	}
+
+//	if(u1Index == i)return RSP_DATA_ERR;				//防止数据传错
+
+	u1MacChk = 0;
+	for(i=0;i<16;i++) pu1MacKey[i] =g_u1PriKey[i];	
+	memset(pu1IV, 0x00, 0x10);
+	u2Len = g_UART_COM_BUF[OFFSET_LEN + u1Index]+OP_HEAD_LEN;
+	AlgSymmMacFun2(&g_UART_COM_BUF[u1Index], &u2Len, pu1MacKey,pu1IV);
+	u2Len = g_UART_COM_BUF[OFFSET_LEN + u1Index]+OP_HEAD_LEN;
+	if (0 != memcmp(g_UART_COM_BUF+u2Len+u1Index,pu1IV,4)) u1MacChk =0x01;
+
+	if(u1MacChk)
+	{
+		u2Status =RSP_CHK_FAIL;
+	}
+	else
+	{
+		u2Status =RSP_SET_SUCCESS;
+		for(i = 0; i< u2Len+4; i++)
+		{
+			g_UART_COM_BUF[i] = g_UART_COM_BUF[i+u1Index];
+		}
+	}
+
+	return u2Status;
+
+}
+
+#endif
 
 
 void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
@@ -530,6 +588,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 	//u1 u1Tmp[48];
 	
 	//ConfigSysClkHigh();
+
+	memset(u1UsartBuffer,0,64);
 	u1UsartBuffer[0] = 0x55;
 	u1UsartBuffer[1] = 0x55;
 	u1UsartBuffer[2] = 0x55;
@@ -573,9 +633,9 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[10] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[11] = pu1IV[2];
 				u1UsartBuffer[12] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,13);
 				
-				
+				//vUartSendData(u1UsartBuffer,13);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 			else
 			{
@@ -593,7 +653,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[8] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,11);
+				//vUartSendData(u1UsartBuffer,11);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 		}
 		else if(u1Opcode == OPCODE_READ_STATUS)
@@ -614,7 +675,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[9] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[10] = pu1IV[2];
 				u1UsartBuffer[11] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,12);
+				//vUartSendData(u1UsartBuffer,12);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 			else
 			{
@@ -632,7 +694,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[8] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,11);
+				//vUartSendData(u1UsartBuffer,11);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 		}
 		else if(u1Opcode==OPCODE_MK_SK)
@@ -680,7 +743,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 			u1UsartBuffer[12] = pu1IV[1];//(u1)u2CRC16Val;
 			u1UsartBuffer[13] = pu1IV[2];
 			u1UsartBuffer[14] = pu1IV[3];
-			vUartSendData(u1UsartBuffer,15);
+			//vUartSendData(u1UsartBuffer,15);
+			writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 		}
 		else if(u1Opcode == OPCODE_READ_SN)
 		{
@@ -704,7 +768,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[g_SNLen+8] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[g_SNLen+9] = pu1IV[2];
 				u1UsartBuffer[g_SNLen+10] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,g_SNLen+11);  
+				//vUartSendData(u1UsartBuffer,g_SNLen+11); 
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 			else
 			{
@@ -722,7 +787,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[8] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,11);
+				//vUartSendData(u1UsartBuffer,11);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 		}
 		else if(u1Opcode == OPCODE_READ_TIME)
@@ -746,7 +812,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[16] = pu1IV[3];
 				//USART_Cmd(USART_PORT, ENABLE);
 				//SendMutliBytes(u1UsartBuffer,17);
-				vUartSendData(u1UsartBuffer,17);
+				//vUartSendData(u1UsartBuffer,17);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 			else
 			{
@@ -764,7 +831,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[8] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,11);
+				//vUartSendData(u1UsartBuffer,11);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 		}
 		else if(u1Opcode == OPCODE_READ_VERSION)
@@ -788,7 +856,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[12] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[13] = pu1IV[2];
 				u1UsartBuffer[14] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,15);
+				//vUartSendData(u1UsartBuffer,15);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 			else
 			{
@@ -806,7 +875,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[8] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,11);
+				//vUartSendData(u1UsartBuffer,11);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 		}
 		else if(u1Opcode == OPCODE_REQ_OK)
@@ -826,7 +896,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[8] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,11);
+				//vUartSendData(u1UsartBuffer,11);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 				//u2SubSec1 = RTC_GetSubSecond();
 			}
 			else
@@ -845,7 +916,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[8] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,11);
+				//vUartSendData(u1UsartBuffer,11);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 		}
 		else if(u1Opcode == OPCODE_SET_CALIB)
@@ -875,7 +947,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[10] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[11] = pu1IV[2];
 				u1UsartBuffer[12] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,13);
+				//vUartSendData(u1UsartBuffer,13);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 			else
 			{
@@ -894,7 +967,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[10] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[11] = pu1IV[2];
 				u1UsartBuffer[12] = pu1IV[3];
-				vUartSendData(u1UsartBuffer,13);
+				//vUartSendData(u1UsartBuffer,13);
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			}
 		}
 		else if(u1Opcode == OPCPDE_READ_TEMP)					//SET_TEMP_BASIC
@@ -932,7 +1006,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 			u1UsartBuffer[13] = pu1IV[1];//(u1)u2CRC16Val;
 			u1UsartBuffer[14] = pu1IV[2];
 			u1UsartBuffer[15] = pu1IV[3];
-			vUartSendData(u1UsartBuffer,16);
+			//vUartSendData(u1UsartBuffer,16);
+			writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 		}		
 		else if(u1Opcode == OPCODE_CHANGE_STATUS)
 		{
@@ -950,7 +1025,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 			u1UsartBuffer[9] = pu1IV[1];//(u1)u2CRC16Val;
 			u1UsartBuffer[10] = pu1IV[2];
 			u1UsartBuffer[11] = pu1IV[3];
-			vUartSendData(u1UsartBuffer,12);
+			//vUartSendData(u1UsartBuffer,12);
+			writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 		}
 		else
 		{
@@ -967,7 +1043,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 			u1UsartBuffer[8] = pu1IV[1];//(u1)u2CRC16Val;
 			u1UsartBuffer[9] = pu1IV[2];
 			u1UsartBuffer[10] = pu1IV[3];
-			vUartSendData(u1UsartBuffer,11);
+			//vUartSendData(u1UsartBuffer,11);
+			writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 			//u2SubSec1 = RTC_GetSubSecond();
 		}
 	}
@@ -986,7 +1063,8 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 		u1UsartBuffer[8] = pu1IV[1];//(u1)u2CRC16Val;
 		u1UsartBuffer[9] = pu1IV[2];
 		u1UsartBuffer[10] = pu1IV[3];
-		vUartSendData(u1UsartBuffer,11);
+		//vUartSendData(u1UsartBuffer,11);
+		writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 	}
 
 	memset(u1UsartBuffer,0x00,sizeof(u1UsartBuffer));

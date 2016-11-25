@@ -1,1 +1,0 @@
-"SrcFile\Func\Sm3Func.c" LARGE BROWSE INCDIR(.\SrcFile\StartUp\CPU;.\SrcFile\Frame\Inc;.\SrcFile\Func\Inc;.\SrcFile\Lib;.\SrcFile\App\Inc) DEFINE (_DEV_BOARD_,_FPGA_DEMO_EN_) DEBUG OBJECTEXTEND PRINT(.\LstFile\Sm3Func.lst) TABS (2) OBJECT(.\ObjFile\Sm3Func.obj)
