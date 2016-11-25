@@ -680,7 +680,7 @@ void vOTP_InitProcess(void)
 {
 	u2 u2Status; 
 	UINT8 u1CHeckStatus;
-	UINT8 u1Datum[64];
+//	UINT8 u1Datum[64];
 //	UINT16 E2prom_Address;
 
 	u2 u2PPM_Value;
@@ -729,8 +729,8 @@ void vOTP_InitProcess(void)
 
 	while(1)
 	{
-		//u2Status = ReceiveData_Poll();
-		readFromROM(u1Datum, EEPROM_ADDRESS, FRAME_LENGTH);
+		u2Status = ReceiveData_Poll();
+		//readFromROM(u1Datum, EEPROM_ADDRESS, FRAME_LENGTH);
 
 
 		if(u2Status == RSP_SET_SUCCESS)
