@@ -532,8 +532,11 @@ u2 ReceiveData_Poll(void)					//Use NFC
 
 	memset(g_UART_COM_BUF, 0x00, FRAME_LENGTH);
 
+	#ifdef __NFC_WITHOUT_BUSY_PIN__
+	Read_NFC(g_UART_COM_BUF, EEPROM_ADDRESS, FRAME_LENGTH);
+	#else
 	readFromROM(g_UART_COM_BUF, EEPROM_ADDRESS, FRAME_LENGTH);
-	
+	#endif
 	u1Index = 0;
 	u1RevDataFlag = 0;
 	while((u1Index < HEAD_LEN))
@@ -635,7 +638,11 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[12] = pu1IV[3];
 				
 				//vUartSendData(u1UsartBuffer,13);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
 			}
 			else
 			{
@@ -654,7 +661,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,11);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
+				
 			}
 		}
 		else if(u1Opcode == OPCODE_READ_STATUS)
@@ -676,7 +688,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[10] = pu1IV[2];
 				u1UsartBuffer[11] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,12);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
+
 			}
 			else
 			{
@@ -695,7 +712,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,11);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
 			}
 		}
 		else if(u1Opcode==OPCODE_MK_SK)
@@ -744,7 +766,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 			u1UsartBuffer[13] = pu1IV[2];
 			u1UsartBuffer[14] = pu1IV[3];
 			//vUartSendData(u1UsartBuffer,15);
-			writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			
+			#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			#endif
 		}
 		else if(u1Opcode == OPCODE_READ_SN)
 		{
@@ -769,7 +796,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[g_SNLen+9] = pu1IV[2];
 				u1UsartBuffer[g_SNLen+10] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,g_SNLen+11); 
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
 			}
 			else
 			{
@@ -788,7 +820,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,11);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
 			}
 		}
 		else if(u1Opcode == OPCODE_READ_TIME)
@@ -813,7 +850,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				//USART_Cmd(USART_PORT, ENABLE);
 				//SendMutliBytes(u1UsartBuffer,17);
 				//vUartSendData(u1UsartBuffer,17);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
 			}
 			else
 			{
@@ -832,7 +874,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,11);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
 			}
 		}
 		else if(u1Opcode == OPCODE_READ_VERSION)
@@ -857,7 +904,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[13] = pu1IV[2];
 				u1UsartBuffer[14] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,15);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
 			}
 			else
 			{
@@ -876,7 +928,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,11);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
 			}
 		}
 		else if(u1Opcode == OPCODE_REQ_OK)
@@ -897,7 +954,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,11);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
 				//u2SubSec1 = RTC_GetSubSecond();
 			}
 			else
@@ -917,7 +979,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,11);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
+				
 			}
 		}
 		else if(u1Opcode == OPCODE_SET_CALIB)
@@ -948,7 +1015,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[11] = pu1IV[2];
 				u1UsartBuffer[12] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,13);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
 			}
 			else
 			{
@@ -968,7 +1040,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[11] = pu1IV[2];
 				u1UsartBuffer[12] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,13);
-				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				
+				#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+				#endif
 			}
 		}
 		else if(u1Opcode == OPCPDE_READ_TEMP)					//SET_TEMP_BASIC
@@ -1007,7 +1084,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 			u1UsartBuffer[14] = pu1IV[2];
 			u1UsartBuffer[15] = pu1IV[3];
 			//vUartSendData(u1UsartBuffer,16);
-			writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			
+			#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			#endif
 		}		
 		else if(u1Opcode == OPCODE_CHANGE_STATUS)
 		{
@@ -1026,7 +1108,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 			u1UsartBuffer[10] = pu1IV[2];
 			u1UsartBuffer[11] = pu1IV[3];
 			//vUartSendData(u1UsartBuffer,12);
-			writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			
+			#ifdef __NFC_WITHOUT_BUSY_PIN__
+					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			#else
+					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			#endif
 		}
 		else
 		{
@@ -1044,7 +1131,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 			u1UsartBuffer[9] = pu1IV[2];
 			u1UsartBuffer[10] = pu1IV[3];
 			//vUartSendData(u1UsartBuffer,11);
-			writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			
+			#ifdef __NFC_WITHOUT_BUSY_PIN__
+				Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			#else
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+			#endif
 			//u2SubSec1 = RTC_GetSubSecond();
 		}
 	}
@@ -1064,7 +1156,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 		u1UsartBuffer[9] = pu1IV[2];
 		u1UsartBuffer[10] = pu1IV[3];
 		//vUartSendData(u1UsartBuffer,11);
-		writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+		
+		#ifdef __NFC_WITHOUT_BUSY_PIN__
+				Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+		#else
+				writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
+		#endif
 	}
 
 	memset(u1UsartBuffer,0x00,sizeof(u1UsartBuffer));

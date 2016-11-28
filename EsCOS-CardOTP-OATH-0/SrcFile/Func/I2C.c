@@ -274,4 +274,64 @@ void IIC_HostInit(void)
 	SDA_OutEn();			//GP15
 	SDA_PuEn();				//иою╜
 }
+/********************************************************************
+	NFC busy control 
+	colin 2016/11/28
+********************************************************************/
+UINT8 Read_NFC_Busy(void)
+{
+	
+	UINT8 busy_flag[1];
+		
+	readFromROM(busy_flag, NFC_BUSY_ADDR, NFC_FLAG_NUM);
+	
+	if(busy_flag[0] == NFC_IS_BUSY)
+	{
+	
+		return TRUE;
+	}
+	else if(busy_flag[0] == NFC_NOT_BUSY)
+	{
+	
+		 return FALSE;
+	}
+	else 
+		return NFC_ERROR;
+	
 
+}
+
+void Set_NFC_Busy(void)
+{
+  UINT8 busy_flag[1]= {NFC_IS_BUSY}; 
+  writeToROM(busy_flag, NFC_BUSY_ADDR, NFC_FLAG_NUM);
+}
+void Clear_NFC_Busy(void)
+{
+  UINT8 busy_flag[1]= {NFC_NOT_BUSY}; 
+  writeToROM(busy_flag, NFC_BUSY_ADDR, NFC_FLAG_NUM);
+
+}
+
+/********************************************************************
+	NFC without busy pin 
+	colin 2016/11/28
+********************************************************************/
+void Read_NFC(UINT8 datum[], UINT16 address, UINT16 num)
+{
+ while(Read_NFC_Busy());
+ Set_NFC_Busy();
+ mDelay(10);
+ readFromROM(datum, address, num);
+ mDelay(10);
+ Clear_NFC_Busy();
+}
+void Write_NFC(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
+{
+	while(Read_NFC_Busy());
+	Set_NFC_Busy();
+ 	mDelay(10);
+	writeToROM(pData, TarAddr, NbByte);
+	mDelay(10);
+ 	Clear_NFC_Busy();
+}
