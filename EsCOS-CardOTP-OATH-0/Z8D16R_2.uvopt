@@ -134,20 +134,30 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>MON51</Key>
-          <Name>-S4 -B115200 -O31</Name>
+          <Name>-S3 -B115200 -O31</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <WatchWindow1>
-        <Ww>
-          <count>0</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>pu1O</ItemText>
-        </Ww>
-      </WatchWindow1>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>701</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>-16776662</Address>
+          <ByteObject>0</ByteObject>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>UARTFUNC.C</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -188,7 +198,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>99</TopLine>
+      <TopLine>100</TopLine>
       <CurrentLine>100</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\StartUp\Z8_STARTUP.A51</PathWithFileName>
@@ -200,10 +210,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>23</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>139</TopLine>
-      <CurrentLine>139</CurrentLine>
+      <CurrentLine>146</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\StartUp\Main.c</PathWithFileName>
       <FilenameWithoutPath>Main.c</FilenameWithoutPath>
@@ -216,8 +226,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>21</TopLine>
-      <CurrentLine>28</CurrentLine>
+      <TopLine>20</TopLine>
+      <CurrentLine>30</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\StartUp\CPU\HardApiAsm.a51</PathWithFileName>
       <FilenameWithoutPath>HardApiAsm.a51</FilenameWithoutPath>
@@ -237,8 +247,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\TbcFunc.c</PathWithFileName>
       <FilenameWithoutPath>TbcFunc.c</FilenameWithoutPath>
@@ -251,8 +261,8 @@
       <Focus>0</Focus>
       <ColumnNumber>14</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>213</TopLine>
-      <CurrentLine>214</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\OtpFunc.c</PathWithFileName>
       <FilenameWithoutPath>OtpFunc.c</FilenameWithoutPath>
@@ -265,8 +275,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>369</TopLine>
-      <CurrentLine>376</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\LcdFunc.c</PathWithFileName>
       <FilenameWithoutPath>LcdFunc.c</FilenameWithoutPath>
@@ -279,8 +289,8 @@
       <Focus>0</Focus>
       <ColumnNumber>20</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>81</TopLine>
-      <CurrentLine>88</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\AdcFunc.c</PathWithFileName>
       <FilenameWithoutPath>AdcFunc.c</FilenameWithoutPath>
@@ -293,8 +303,8 @@
       <Focus>0</Focus>
       <ColumnNumber>9</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>11</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\ScuFunc.c</PathWithFileName>
       <FilenameWithoutPath>ScuFunc.c</FilenameWithoutPath>
@@ -305,10 +315,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>43</ColumnNumber>
+      <ColumnNumber>10</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>540</TopLine>
-      <CurrentLine>540</CurrentLine>
+      <TopLine>689</TopLine>
+      <CurrentLine>697</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\UartFunc.c</PathWithFileName>
       <FilenameWithoutPath>UartFunc.c</FilenameWithoutPath>
@@ -321,8 +331,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>65</TopLine>
-      <CurrentLine>66</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\TimerFunc.c</PathWithFileName>
       <FilenameWithoutPath>TimerFunc.c</FilenameWithoutPath>
@@ -335,8 +345,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\WdtFunc.c</PathWithFileName>
       <FilenameWithoutPath>WdtFunc.c</FilenameWithoutPath>
@@ -349,8 +359,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\Hmac.c</PathWithFileName>
       <FilenameWithoutPath>Hmac.c</FilenameWithoutPath>
@@ -363,8 +373,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\Sha1.c</PathWithFileName>
       <FilenameWithoutPath>Sha1.c</FilenameWithoutPath>
@@ -373,12 +383,12 @@
       <GroupNumber>2</GroupNumber>
       <FileNumber>14</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>54</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>290</TopLine>
-      <CurrentLine>308</CurrentLine>
+      <TopLine>281</TopLine>
+      <CurrentLine>286</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\I2C.c</PathWithFileName>
       <FilenameWithoutPath>I2C.c</FilenameWithoutPath>
@@ -412,8 +422,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>63</TopLine>
-      <CurrentLine>67</CurrentLine>
+      <TopLine>44</TopLine>
+      <CurrentLine>51</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\IsrFrame.c</PathWithFileName>
       <FilenameWithoutPath>IsrFrame.c</FilenameWithoutPath>
@@ -424,10 +434,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>8</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>721</TopLine>
-      <CurrentLine>734</CurrentLine>
+      <TopLine>1705</TopLine>
+      <CurrentLine>1705</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\OtpFrame.c</PathWithFileName>
       <FilenameWithoutPath>OtpFrame.c</FilenameWithoutPath>
@@ -440,8 +450,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\AdcFrame.c</PathWithFileName>
       <FilenameWithoutPath>AdcFrame.c</FilenameWithoutPath>
@@ -452,10 +462,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>7</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>186</TopLine>
-      <CurrentLine>187</CurrentLine>
+      <TopLine>46</TopLine>
+      <CurrentLine>51</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\SM4Process.c</PathWithFileName>
       <FilenameWithoutPath>SM4Process.c</FilenameWithoutPath>
@@ -468,8 +478,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\UartFrame.c</PathWithFileName>
       <FilenameWithoutPath>UartFrame.c</FilenameWithoutPath>

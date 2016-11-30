@@ -281,35 +281,68 @@ void IIC_HostInit(void)
 UINT8 Read_NFC_Busy(void)
 {
 	
-	UINT8 busy_flag[1];
+	UINT8 busy_flag=0;
 		
-	readFromROM(busy_flag, NFC_BUSY_ADDR, NFC_FLAG_NUM);
+	readFromROM(&busy_flag, NFC_BUSY_ADDR, NFC_FLAG_NUM);
 	
-	if(busy_flag[0] == NFC_IS_BUSY)
+	if(busy_flag == NFC_IS_BUSY)
 	{
 	
 		return TRUE;
 	}
-	else if(busy_flag[0] == NFC_NOT_BUSY)
+	else
+	// if(busy_flag == NFC_NOT_BUSY)
 	{
 	
 		 return FALSE;
 	}
-	else 
-		return NFC_ERROR;
+//	else 
+//		return NFC_ERROR;
 	
 
 }
 
 void Set_NFC_Busy(void)
 {
-  UINT8 busy_flag[1]= {NFC_IS_BUSY}; 
-  writeToROM(busy_flag, NFC_BUSY_ADDR, NFC_FLAG_NUM);
+  UINT8 busy_flag= NFC_IS_BUSY; 
+  writeToROM(&busy_flag, NFC_BUSY_ADDR, NFC_FLAG_NUM);
 }
 void Clear_NFC_Busy(void)
 {
-  UINT8 busy_flag[1]= {NFC_NOT_BUSY}; 
-  writeToROM(busy_flag, NFC_BUSY_ADDR, NFC_FLAG_NUM);
+  UINT8 busy_flag= NFC_NOT_BUSY; 
+  writeToROM(&busy_flag, NFC_BUSY_ADDR, NFC_FLAG_NUM);
+
+}
+/********************************************************************
+	NFC PC and MCU Data status 
+	colin 2016/11/28
+********************************************************************/
+void MCU_Data_EN(void)
+{
+	UINT8 MCU_Data_status= NFC_MCU_DATA_EN; 
+  	writeToROM(&MCU_Data_status, NFC_DATA_EN_ADDR, NFC_DATA_FLAG_LEN);
+}
+UINT8 PC_Data_EN(void)
+{
+  UINT8 pc_data_status=0;
+  readFromROM(&pc_data_status, NFC_DATA_EN_ADDR, NFC_DATA_FLAG_LEN);
+  if(pc_data_status == NFC_PC_DATA_EN)
+  	{
+	  return TRUE;
+  	}
+  else
+  	{
+	  return FALSE;		
+  	}
+
+}
+
+void MCU_Data_Recevied(void)
+{
+
+
+  UINT8 MCU_Data_status= NFC_DATA_REC; 
+  writeToROM(&MCU_Data_status, NFC_DATA_EN_ADDR, NFC_DATA_FLAG_LEN);
 
 }
 
@@ -333,5 +366,6 @@ void Write_NFC(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
  	mDelay(10);
 	writeToROM(pData, TarAddr, NbByte);
 	mDelay(10);
+	MCU_Data_EN();
  	Clear_NFC_Busy();
 }

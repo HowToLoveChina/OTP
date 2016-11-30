@@ -530,6 +530,13 @@ u2 ReceiveData_Poll(void)					//Use NFC
 	u1 i;
 	//u1 u1ReceData;
 
+	// add pc data judge by colin 2016/11/30
+	if(PC_Data_EN()==FALSE)
+	{
+		return RSP_REV_TIMEOUT;
+	}
+	
+	
 	memset(g_UART_COM_BUF, 0x00, FRAME_LENGTH);
 
 	#ifdef __NFC_WITHOUT_BUSY_PIN__
@@ -678,7 +685,11 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[6] = (u1)(u2Rsp>>8);
 				u1UsartBuffer[7] = (u1)u2Rsp;
 				
-				for(i=0;i<16;i++) pu1MacKey[i] =g_u1PriKey[i];
+				for(i=0;i<16;i++)
+				{
+				 pu1MacKey[i] =g_u1PriKey[i];
+				}
+
 				memset(pu1IV, 0x00, 0x10);
 				u2Len = 0x05;
 				AlgSymmMacFun2(&u1UsartBuffer[3], &u2Len, pu1MacKey, pu1IV);
@@ -688,12 +699,13 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[10] = pu1IV[2];
 				u1UsartBuffer[11] = pu1IV[3];
 				//vUartSendData(u1UsartBuffer,12);
+
 				#ifdef __NFC_WITHOUT_BUSY_PIN__
 					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 				#else
 					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 				#endif
-
+				  memset(u1UsartBuffer,0,64);
 			}
 			else
 			{
