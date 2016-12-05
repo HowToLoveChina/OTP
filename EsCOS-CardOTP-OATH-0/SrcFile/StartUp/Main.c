@@ -262,7 +262,7 @@ void Main(void)
 			switch(gUseCase)
 			{
 			   	case OTPSTATUS_HARDWARE:	       //按键检测
-			    	case OTPSTATUS_PARACHECK:
+			    case OTPSTATUS_PARACHECK:
 				case OTPSTATUS_CALIB: 
 				case OTPSTATUS_SN_TIME:			   //SN_时间输入
 				case OTPSTATUS_MACKEY:			

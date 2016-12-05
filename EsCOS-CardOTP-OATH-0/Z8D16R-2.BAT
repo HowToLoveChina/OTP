@@ -31,3 +31,4 @@ SET CPU_XTAL=0x00B71B00
 "C:\Keil\C51\BIN\A51.EXE" @.\ObjFile\BIGAPI~1._IA
 "C:\Keil\C51\BIN\BL51.EXE" @.\ObjFile\Z8D16R_2.lnp
 "C:\Keil\C51\BIN\OH51.EXE" ".\ObjFile\Z8D16R_2" 
+.\Tool\gen_bin.bat

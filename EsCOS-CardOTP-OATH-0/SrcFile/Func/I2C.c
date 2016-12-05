@@ -176,7 +176,7 @@ void writeToROM(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
       align_mem_offset = bytes_to_write;
     }
     writeFourBytesToROM(pdata_index, mem_addr, align_mem_offset);
-		mDelay(10);
+		mDelay(1);
 
     pdata_index += align_mem_offset;
     mem_addr += align_mem_offset;
@@ -222,7 +222,7 @@ void readFromROM(UINT8 datum[], UINT16 address, UINT16 num)
 			_nop_();			
 			
 			SDA_InEn();		// ‰»Î		
-			tempbit = (IOMP1DIN&0x80); //SDA ;				
+			tempbit = (IOMP1DIN&0x40); //SDA ;				
 			SDA_OutEn();
 			
 			if (tempbit)
@@ -363,9 +363,11 @@ void Write_NFC(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
 {
 	while(Read_NFC_Busy());
 	Set_NFC_Busy();
- 	mDelay(10);
+
 	writeToROM(pData, TarAddr, NbByte);
-	mDelay(10);
+//	mDelay(50);
 	MCU_Data_EN();
+//	mDelay(10);
  	Clear_NFC_Busy();
+//	mDelay(10);
 }

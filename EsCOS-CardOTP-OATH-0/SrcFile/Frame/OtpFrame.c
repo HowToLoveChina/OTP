@@ -923,7 +923,7 @@ void vOTP_InitProcess(void)
 						vScu_SetSysClk64K();			//9600_test
 						WT_Onehour_Flag = 1;
 						#endif
-						vUartInit();
+						//vUartInit();
 						USART_TxRsp(u2Status,OPCPDE_READ_TEMP);
 					 }
 					 else
