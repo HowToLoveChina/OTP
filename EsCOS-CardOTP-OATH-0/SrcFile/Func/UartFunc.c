@@ -599,7 +599,7 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 	
 	//ConfigSysClkHigh();
 
-	memset(u1UsartBuffer,0,64);
+	memset(u1UsartBuffer,0xFF,64);
 	u1UsartBuffer[0] = 0x55;
 	u1UsartBuffer[1] = 0x55;
 	u1UsartBuffer[2] = 0x55;
@@ -705,7 +705,7 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				#else
 					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,FRAME_LENGTH);
 				#endif
-				  memset(u1UsartBuffer,0,64);
+	//			  memset(u1UsartBuffer,0,64);
 			}
 			else
 			{

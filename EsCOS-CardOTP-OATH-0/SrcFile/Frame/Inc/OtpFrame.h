@@ -23,7 +23,7 @@
 #define TIMEOUT_SEC				60		//120
 
 #define FRAME_HEAD						0x55
-#define FRAME_LENGTH					0x40
+#define FRAME_LENGTH					0x40	// 64bytes
 #define EEPROM_ADDRESS				0x0000
 
 

@@ -368,10 +368,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>14</ColumnNumber>
+      <ColumnNumber>15</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>355</TopLine>
-      <CurrentLine>368</CurrentLine>
+      <TopLine>8</TopLine>
+      <CurrentLine>21</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\I2C.c</PathWithFileName>
       <FilenameWithoutPath>I2C.c</FilenameWithoutPath>
@@ -382,10 +382,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>36</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>58</TopLine>
+      <CurrentLine>58</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\Uc8118.c</PathWithFileName>
       <FilenameWithoutPath>Uc8118.c</FilenameWithoutPath>
@@ -419,8 +419,8 @@
       <Focus>0</Focus>
       <ColumnNumber>6</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>717</TopLine>
-      <CurrentLine>727</CurrentLine>
+      <TopLine>729</TopLine>
+      <CurrentLine>729</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\OtpFrame.c</PathWithFileName>
       <FilenameWithoutPath>OtpFrame.c</FilenameWithoutPath>
