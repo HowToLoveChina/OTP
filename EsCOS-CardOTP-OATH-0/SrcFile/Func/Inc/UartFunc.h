@@ -9,6 +9,8 @@
 #define USART_COMPLETED     0x03
 #define SYN_LEN         0x03
 #define SYN_BYTE        0x55
+#define HEAD_LEN 		0x03
+#define OP_HEAD_LEN		0x02	// OPcode+Len data
 
 #define OFFSET_OP       0x00
 #define OFFSET_LEN      0x01

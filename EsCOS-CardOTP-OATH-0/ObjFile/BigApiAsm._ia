@@ -1,1 +1,0 @@
-"SrcFile\Lib\BigApiAsm.a51" SET (LARGE) DEBUG PRINT(.\LstFile\BigApiAsm.lst) OBJECT(.\ObjFile\BigApiAsm.obj) EP

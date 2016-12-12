@@ -1,1 +1,0 @@
-"SrcFile\StartUp\CPU\HardApiAsm.a51" SET (LARGE) DEBUG PRINT(.\LstFile\HardApiAsm.lst) OBJECT(.\ObjFile\HardApiAsm.obj) EP
