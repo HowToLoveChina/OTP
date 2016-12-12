@@ -1006,6 +1006,12 @@ void vOTP_InitProcess(void)
 		else if(RSP_DATA_ERR == u2Status)
 		{
 			USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+		}									  
+		else if(RSP_RECEIVE_ERR == u2Status)
+		{
+
+			USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+			mDelay(1000);
 		}
 
 	}

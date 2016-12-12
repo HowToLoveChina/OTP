@@ -193,10 +193,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>40</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>268</TopLine>
-      <CurrentLine>276</CurrentLine>
+      <TopLine>255</TopLine>
+      <CurrentLine>264</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\StartUp\Main.c</PathWithFileName>
       <FilenameWithoutPath>Main.c</FilenameWithoutPath>
@@ -298,10 +298,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>9</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>829</TopLine>
-      <CurrentLine>837</CurrentLine>
+      <TopLine>673</TopLine>
+      <CurrentLine>673</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\UartFunc.c</PathWithFileName>
       <FilenameWithoutPath>UartFunc.c</FilenameWithoutPath>
@@ -368,10 +368,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>15</ColumnNumber>
+      <ColumnNumber>19</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>8</TopLine>
-      <CurrentLine>21</CurrentLine>
+      <TopLine>183</TopLine>
+      <CurrentLine>185</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\I2C.c</PathWithFileName>
       <FilenameWithoutPath>I2C.c</FilenameWithoutPath>
@@ -417,10 +417,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>6</ColumnNumber>
+      <ColumnNumber>96</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>729</TopLine>
-      <CurrentLine>729</CurrentLine>
+      <TopLine>997</TopLine>
+      <CurrentLine>1005</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\OtpFrame.c</PathWithFileName>
       <FilenameWithoutPath>OtpFrame.c</FilenameWithoutPath>

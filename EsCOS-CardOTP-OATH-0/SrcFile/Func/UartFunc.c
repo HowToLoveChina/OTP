@@ -533,7 +533,7 @@ u2 ReceiveData_Poll(void)					//Use NFC
 	// add pc data judge by colin 2016/11/30
 	if(PC_Data_EN()==FALSE)
 	{
-		return RSP_REV_TIMEOUT;
+		return RSP_RECEIVE_ERR;
 	}
 	
 	
@@ -544,6 +544,7 @@ u2 ReceiveData_Poll(void)					//Use NFC
 	#else
 	readFromROM(g_UART_COM_BUF, EEPROM_ADDRESS, FRAME_LENGTH);
 	#endif
+	
 	u1Index = 0;
 	u1RevDataFlag = 0;
 	while((u1Index < HEAD_LEN))
