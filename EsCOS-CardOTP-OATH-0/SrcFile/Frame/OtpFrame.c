@@ -1011,7 +1011,7 @@ void vOTP_InitProcess(void)
 		{
 
 			USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
-			mDelay(1000);
+			mDelay(100);
 		}
 
 	}

@@ -274,6 +274,8 @@ void IIC_HostInit(void)
 
 	SDA_OutEn();			//GP15
 	SDA_PuEn();				//иою╜
+
+	BUSY_InEn();		// GP13 
 }
 /********************************************************************
 	NFC busy control 
@@ -318,6 +320,23 @@ void Clear_NFC_Busy(void)
 	NFC PC and MCU Data status 
 	colin 2016/11/28
 ********************************************************************/
+UINT8 NFC_Busy_Status(void)
+{
+  UINT8 nfc_busy_status=0;
+  //UINT8 tempbit = 1 ;
+  
+  nfc_busy_status = (IOMP1DIN&BUSY_PIN); //Busy pin hight is not busy
+  
+  if(nfc_busy_status == NFC_BUSY_STA)
+  	{
+	  return TRUE;	// NFC is busy
+  	}
+  else
+  	{
+	  return FALSE;	// NFC is not busy
+  	}
+
+}
 void MCU_Data_EN(void)
 {
 	UINT8 MCU_Data_status= NFC_MCU_DATA_EN; 

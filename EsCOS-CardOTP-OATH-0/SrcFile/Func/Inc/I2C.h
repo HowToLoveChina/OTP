@@ -11,33 +11,24 @@
 
 #define M24LR_PAGEWRITE_NBBYTE          0x04
 
-//#define SCL_HIGH()  	{IOMP0DOUT|=(0x01<<1);}		
-//#define SCL_LOW()		  {IOMP0DOUT&=(~(0x01<<1));}	
-//
-//#define SDA_HIGH()  	{IOMP0DOUT|=(0x01<<0);}		
-//#define SDA_LOW()		  {IOMP0DOUT&=~(0x01<<0);}	
-//
-//#define SCL_PuEn()			{IOMP0PU|=0x02;}
-//#define SDA_PuEn()			{IOMP0PU|=0x01;}
-//
-//#define SCL_OutEn()			{IOMP0DIR|=0x02;}
-//#define SDA_OutEn()			{IOMP0DIR|=0x01;}
-//
-//#define SDA_InEn()			{IOMP0DIR&=0xFE;}
+#define SCL_PIN			(0x01<<7)	// GPIO15
+#define SDA_PIN			(0x01<<6)	// GPIO14
+#define BUSY_PIN		(0x01<<5)	// GPIO13
 
-#define SCL_HIGH()  	{IOMP1DOUT|=	(0x01<<(15-8));}		
-#define SCL_LOW()		  {IOMP1DOUT&=(~(0x01<<(15-8)));}	
+#define SCL_HIGH()  	  	{IOMP1DOUT |= (SCL_PIN);}		
+#define SCL_LOW()		  	{IOMP1DOUT &= (~SCL_PIN);}	
 
-#define SDA_HIGH()  	{IOMP1DOUT|=(0x01<<(14-8));}		
-#define SDA_LOW()		  {IOMP1DOUT&=~(0x01<<(14-8));}	
+#define SDA_HIGH()			{IOMP1DOUT |= (SDA_PIN);}		
+#define SDA_LOW()		  	{IOMP1DOUT &= (~SDA_PIN);}	
 
-#define SCL_PuEn()			{IOMP1PU|=0x80;}
-#define SDA_PuEn()			{IOMP1PU|=0x40;}
+#define SCL_PuEn()			{IOMP1PU |= SCL_PIN;}
+#define SDA_PuEn()			{IOMP1PU |= SDA_PIN;}
 
-#define SCL_OutEn()			{IOMP1DIR|=0x80;}
-#define SDA_OutEn()			{IOMP1DIR|=0x40;}
+#define SCL_OutEn()			{IOMP1DIR |= SCL_PIN;}
+#define SDA_OutEn()			{IOMP1DIR |= SDA_PIN;}
 
-#define SDA_InEn()			{IOMP1DIR&=0xBF;}
+#define SDA_InEn()			{IOMP1DIR &= (~SDA_PIN);}
+#define BUSY_InEn()			{IOMP1DIR &= (~BUSY_PIN);}
 
 void I2C_DELAY(void);
 void mDelay(UINT8 k);
@@ -58,12 +49,15 @@ void IIC_HostInit(void);
 #define NFC_DATA_REC		0xCC		// mcu data recevied
 #define NFC_DATA_FLAG_LEN	0x01
 
+#define NFC_BUSY_STA		0
 BOOL Read_NFC_Busy(void);
 void Set_NFC_Busy(void);
 void Clear_NFC_Busy(void);
 void Read_NFC(UINT8 datum[], UINT16 address, UINT16 num);
 void Write_NFC(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte);
 
+
+UINT8 NFC_Busy_Status(void);
 void MCU_Data_EN(void);
 UINT8 PC_Data_EN(void);
 void MCU_Data_Recevied(void);

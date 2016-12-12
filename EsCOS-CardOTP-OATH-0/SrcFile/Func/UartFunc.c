@@ -529,7 +529,13 @@ u2 ReceiveData_Poll(void)					//Use NFC
 	u1 u1Index;
 	u1 i;
 	//u1 u1ReceData;
+	//add nfc busy judge by colin 2016/12/12
+	if(NFC_Busy_Status() == TRUE)	// NFC is busy
+	{
+		return RSP_RECEIVE_ERR;
+	}
 
+	
 	// add pc data judge by colin 2016/11/30
 	if(PC_Data_EN()==FALSE)
 	{
