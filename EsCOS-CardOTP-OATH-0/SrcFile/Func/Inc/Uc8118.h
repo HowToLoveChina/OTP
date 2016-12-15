@@ -7,9 +7,9 @@
 #define EPD_SPI_RST_PIN			(0x01<<3)		// GPIO3
 #define EPD_SPI_SHD_PIN			(0x01<<7)		// GPIO7
 #define EPD_SPI_SDA_PIN			(0x01<<0)		// GPIO8
-#define EPD_SPI_SCL_PIN			(0x01<<1)		// GPIO9
-#define EPD_SPI_CSB_PIN			(0x01<<6)		// GPIO14
-#define EPD_SPI_BUSY_PIN		(0x01<<7)		// GPIO15
+#define EPD_SPI_SCL_PIN			(0x01<<1)		// TBD
+#define EPD_SPI_CSB_PIN			(0x01<<2)		// TBD
+#define EPD_SPI_BUSY_PIN		(0x01<<3)		// TBD
 
 #define EPD_SPI_BUSY 			((IOMP1DIN&EPD_SPI_BUSY_PIN) == EPD_SPI_BUSY_PIN?1:0) // GPIO15<-->BUSY 
 

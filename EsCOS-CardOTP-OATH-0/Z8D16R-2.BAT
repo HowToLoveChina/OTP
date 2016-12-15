@@ -17,8 +17,8 @@ SET CPU_XTAL=0x00B71B00
 "C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\WdtFunc.__i
 "C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\Hmac.__i
 "C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\Sha1.__i
-"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\I2C.__i
 "C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\Uc8118.__i
+"C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\NFCFunc.__i
 "C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\IsrFrame.__i
 "C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\OtpFrame.__i
 "C:\Keil\C51\BIN\C51.EXE" @.\ObjFile\AdcFrame.__i

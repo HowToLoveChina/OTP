@@ -40,7 +40,7 @@ Special statement:
 #include "WDTFUNC.H"
 #include "SecFunc.h"
 #include "SM4Process.h"
-#include "I2C.h"
+#include "NFCFunc.h"
 
 //UINT8 bOpenHash,bCloseLCD,bAlwaysbdisplay;
 UINT8 DispKeyPad[SCREENLEN];
@@ -725,10 +725,12 @@ void vOTP_InitProcess(void)
 	IIC_HostInit(); 		//Add IIC init colin 2016/11/24
 
 	vIom_LsclkOutEn();
-			
+
+		
 
 	while(1)
 	{
+		vScu_SetSysClkOsc2M();	
 		u2Status = ReceiveData_Poll();
 		//readFromROM(u1Datum, EEPROM_ADDRESS, FRAME_LENGTH);
 
@@ -1006,11 +1008,12 @@ void vOTP_InitProcess(void)
 		else if(RSP_DATA_ERR == u2Status)
 		{
 			USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+			mDelay(100);
 		}									  
 		else if(RSP_RECEIVE_ERR == u2Status)
 		{
 
-			USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
+			//USART_TxRsp(u2Status,g_UART_COM_BUF[OFFSET_OP]);
 			mDelay(100);
 		}
 

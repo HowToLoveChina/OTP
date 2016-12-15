@@ -1,7 +1,8 @@
 #ifndef __I2C_HOST_H__
 #define __I2C_HOST_H__
 
-#define __NFC_WITHOUT_BUSY_PIN__
+#define __NFC_WITH_BUSY_PIN__
+#define __USE_NFC__
 
 #include "typedefine.h"
 #include "scufunc.h"
@@ -36,7 +37,7 @@ void writeToROM(UINT8 datum[], UINT16 address, UINT16 num);
 void readFromROM(UINT8 datum[], UINT16 address, UINT16 num);
 void IIC_HostInit(void);
 
-#ifdef __NFC_WITHOUT_BUSY_PIN__
+#ifdef __NFC_WITH_BUSY_PIN__
 #define NFC_BUSY_ADDR	(0x007F<<2) //508
 #define NFC_IS_BUSY		0x11
 #define NFC_NOT_BUSY	0x00
@@ -49,7 +50,7 @@ void IIC_HostInit(void);
 #define NFC_DATA_REC		0xCC		// mcu data recevied
 #define NFC_DATA_FLAG_LEN	0x01
 
-#define NFC_BUSY_STA		0
+#define NFC_BUSY_STA		0			// Busy pin low is nfc busy
 BOOL Read_NFC_Busy(void);
 void Set_NFC_Busy(void);
 void Clear_NFC_Busy(void);

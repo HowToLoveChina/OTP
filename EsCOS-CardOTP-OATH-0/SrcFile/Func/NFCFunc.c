@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------
 Acess the M24LR04E
 ----------------------------------------------------------------*/
-#include "I2C.h"
+#include "NFCFunc.h"
 #include <intrins.h> 
 
 void I2C_DELAY(void)
@@ -9,7 +9,7 @@ void I2C_DELAY(void)
 	_nop_();_nop_();_nop_();_nop_();
 }
 //----------------------------------------------------------------
-// delay 100us
+// delay 
 //----------------------------------------------------------------
 void mDelay(UINT8 k)
 {
@@ -17,7 +17,6 @@ void mDelay(UINT8 k)
 	
 	for(; k>0; k--)
 	{
-	//	for(i=0; i<1993; i++);
 		for(i=0; i<78; i++);
 	}
 }
@@ -77,13 +76,15 @@ UINT8 RecvACK(void)
 	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
 	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();		
 	SDA_InEn();
-  data_temp = IOMP1DIN&0x80;
+    data_temp = IOMP1DIN&SDA_PIN; 
 	
 	SCL_HIGH(); 
-	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
+	
+  data_temp = ~(IOMP1DIN&SDA_PIN); // GPIO14 ACK LOW active 
 	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
 	_nop_();_nop_();_nop_();_nop_();_nop_();	
-	SCL_LOW();   
+	SCL_LOW(); 
+
 	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
 	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
 	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
@@ -92,7 +93,7 @@ UINT8 RecvACK(void)
 	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
 	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
 	_nop_();_nop_();	
-	
+
 	SDA_OutEn();
 	
   return data_temp;		
@@ -109,7 +110,7 @@ void writeByte(UINT8 datum)
 	for(bitCnt=0; bitCnt<8; bitCnt++)
 	{		
 		SCL_LOW();
-		I2C_DELAY();
+		//I2C_DELAY();
 		
 		if ((datum&0x80) == 0x80) //if the MSb is 1
 		{
@@ -122,8 +123,7 @@ void writeByte(UINT8 datum)
 		I2C_DELAY();
 		
 		SCL_HIGH();
-		I2C_DELAY();
-	  _nop_();_nop_();_nop_();_nop_();_nop_();			
+		I2C_DELAY();			
 		
 		datum<<=1 ; 
 	}	
@@ -177,7 +177,7 @@ void writeToROM(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
       align_mem_offset = bytes_to_write;
     }
     writeFourBytesToROM(pdata_index, mem_addr, align_mem_offset);
-		mDelay(1);
+		mDelay(5);
 
     pdata_index += align_mem_offset;
     mem_addr += align_mem_offset;
@@ -220,7 +220,7 @@ void readFromROM(UINT8 datum[], UINT16 address, UINT16 num)
 		for(bitCnt=0; bitCnt<8; bitCnt++)
 		{
 			SCL_LOW(); 
-			_nop_();			
+		//	_nop_();			
 			
 			SDA_InEn();		//ÊäÈë		
 			tempbit = (IOMP1DIN&0x40); //SDA ;				
@@ -278,8 +278,12 @@ void IIC_HostInit(void)
 	BUSY_InEn();		// GP13 
 }
 /********************************************************************
-	NFC busy control 
-	colin 2016/11/28
+// Fuction : Read nfc busy status
+// Param: void
+// Return: TRUE: NFC is busy  
+// 		   FALSE: NFC not busy
+// Author: Colin
+// Data: 2016/12/9 
 ********************************************************************/
 UINT8 Read_NFC_Busy(void)
 {
@@ -288,21 +292,13 @@ UINT8 Read_NFC_Busy(void)
 		
 	readFromROM(&busy_flag, NFC_BUSY_ADDR, NFC_FLAG_NUM);
 	
-	if(busy_flag == NFC_IS_BUSY)
+	if(NFC_IS_BUSY == busy_flag)
 	{
 	
 		return TRUE;
 	}
-	else
-	// if(busy_flag == NFC_NOT_BUSY)
-	{
-	
+	else	
 		 return FALSE;
-	}
-//	else 
-//		return NFC_ERROR;
-	
-
 }
 
 void Set_NFC_Busy(void)
@@ -317,17 +313,20 @@ void Clear_NFC_Busy(void)
 
 }
 /********************************************************************
-	NFC PC and MCU Data status 
-	colin 2016/11/28
+// Fuction : Read nfc busy pin status
+// Param: void
+// Return: TRUE: NFC is busy  
+// 		   FALSE: NFC is not busy
+// Author: Colin
+// Data: 2016/12/9 
 ********************************************************************/
 UINT8 NFC_Busy_Status(void)
 {
   UINT8 nfc_busy_status=0;
-  //UINT8 tempbit = 1 ;
   
   nfc_busy_status = (IOMP1DIN&BUSY_PIN); //Busy pin hight is not busy
   
-  if(nfc_busy_status == NFC_BUSY_STA)
+  if(NFC_BUSY_STA == nfc_busy_status)
   	{
 	  return TRUE;	// NFC is busy
   	}
@@ -337,16 +336,33 @@ UINT8 NFC_Busy_Status(void)
   	}
 
 }
+/********************************************************************
+// Fuction : Mcu already paper data and send to nfc device,set the flag
+// Param: void
+// Return: void
+// Author: Colin
+// Data: 2016/12/9 
+********************************************************************/
 void MCU_Data_EN(void)
 {
 	UINT8 MCU_Data_status= NFC_MCU_DATA_EN; 
   	writeToROM(&MCU_Data_status, NFC_DATA_EN_ADDR, NFC_DATA_FLAG_LEN);
 }
+/********************************************************************
+// Fuction : Read the pc data paper flag
+// Param: void
+// Return: 
+			TRUE: PC aleady paper data
+			FALSE:PC is not ready to data 
+// Author: Colin
+// Data: 2016/12/9 
+********************************************************************/
 UINT8 PC_Data_EN(void)
 {
   UINT8 pc_data_status=0;
-  readFromROM(&pc_data_status, NFC_DATA_EN_ADDR, NFC_DATA_FLAG_LEN);
-  if(pc_data_status == NFC_PC_DATA_EN)
+  readFromROM(&pc_data_status, NFC_DATA_EN_ADDR, NFC_DATA_FLAG_LEN);// read 0x007E data
+  
+  if(NFC_PC_DATA_EN == pc_data_status) 
   	{
 	  return TRUE;
   	}
@@ -357,37 +373,47 @@ UINT8 PC_Data_EN(void)
 
 }
 
-void MCU_Data_Recevied(void)
-{
+//void MCU_Data_Recevied(void)
+//{
 
-
-  UINT8 MCU_Data_status= NFC_DATA_REC; 
-  writeToROM(&MCU_Data_status, NFC_DATA_EN_ADDR, NFC_DATA_FLAG_LEN);
-
-}
+//  UINT8 MCU_Data_status= NFC_DATA_REC; 
+//  writeToROM(&MCU_Data_status, NFC_DATA_EN_ADDR, NFC_DATA_FLAG_LEN);
+//}
 
 /********************************************************************
-	NFC without busy pin 
-	colin 2016/11/28
+// Fuction : Read nfc data
+// Param1: [OUT]  Nfc data output  
+// Param2: [IN]   read nfc data from  start address
+// Param3: [IN]   read nfc data lens
+// Return:void
+// Author: Colin
+// Data: 2016/12/9 
 ********************************************************************/
 void Read_NFC(UINT8 datum[], UINT16 address, UINT16 num)
 {
- while(Read_NFC_Busy());
+// vScu_SetSysClkOsc2M();
+ while(NFC_Busy_Status()); // wait for nfc is not busy
+ //while(Read_NFC_Busy());
  Set_NFC_Busy();
- mDelay(10);
  readFromROM(datum, address, num);
- mDelay(10);
  Clear_NFC_Busy();
 }
+/********************************************************************
+// Fuction : write nfc data
+// Param1: [IN]   Nfc data input  
+// Param2: [IN]   write nfc data from  start address
+// Param3: [IN]   write nfc data lens
+// Return:void
+// Author: Colin
+// Data: 2016/12/9 
+********************************************************************/
 void Write_NFC(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
-{
-	while(Read_NFC_Busy());
+{	
+	//vScu_SetSysClkOsc2M();
+	while(NFC_Busy_Status());// wait for nfc is not busy
+//	while(Read_NFC_Busy());
 	Set_NFC_Busy();
-
 	writeToROM(pData, TarAddr, NbByte);
-//	mDelay(50);
 	MCU_Data_EN();
-//	mDelay(10);
- 	Clear_NFC_Busy();
-//	mDelay(10);
+ 	Clear_NFC_Busy();	
 }
