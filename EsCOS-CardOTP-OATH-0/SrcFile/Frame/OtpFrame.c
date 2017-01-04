@@ -722,16 +722,16 @@ void vOTP_InitProcess(void)
 //	vScu_SetSysClk64K();		//9600_test
 //	vUartInit();				//change Uart to NFC
 
-	IIC_HostInit(); 		//Add IIC init colin 2016/11/24
+	NFC_Init(); 		//Add IIC init colin 2016/11/24
 
 	vIom_LsclkOutEn();
 
 		
 
 	while(1)
-	{
-		vScu_SetSysClkOsc2M();	
-		u2Status = ReceiveData_Poll();
+	{	
+		vScu_SetSysClkOsc2M();		
+		u2Status = ReceiveData_Poll();		
 		//readFromROM(u1Datum, EEPROM_ADDRESS, FRAME_LENGTH);
 
 

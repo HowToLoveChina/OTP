@@ -31,12 +31,6 @@
 #define SDA_InEn()			{IOMP1DIR &= (~SDA_PIN);}
 #define BUSY_InEn()			{IOMP1DIR &= (~BUSY_PIN);}
 
-void I2C_DELAY(void);
-void mDelay(UINT8 k);
-void writeToROM(UINT8 datum[], UINT16 address, UINT16 num);
-void readFromROM(UINT8 datum[], UINT16 address, UINT16 num);
-void IIC_HostInit(void);
-
 #ifdef __NFC_WITH_BUSY_PIN__
 #define NFC_BUSY_ADDR	(0x007F<<2) //508
 #define NFC_IS_BUSY		0x11
@@ -51,17 +45,14 @@ void IIC_HostInit(void);
 #define NFC_DATA_FLAG_LEN	0x01
 
 #define NFC_BUSY_STA		0			// Busy pin low is nfc busy
-BOOL Read_NFC_Busy(void);
-void Set_NFC_Busy(void);
-void Clear_NFC_Busy(void);
-void Read_NFC(UINT8 datum[], UINT16 address, UINT16 num);
-void Write_NFC(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte);
-
 
 UINT8 NFC_Busy_Status(void);
-void MCU_Data_EN(void);
 UINT8 PC_Data_EN(void);
-void MCU_Data_Recevied(void);
+
+void mDelay(UINT8 k);
+void NFC_Init(void);
+void Read_NFC(UINT8 datum[], UINT16 address, UINT16 num);
+void Write_NFC(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte);
 
 #endif
 

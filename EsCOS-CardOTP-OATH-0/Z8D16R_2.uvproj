@@ -418,14 +418,14 @@
               <FilePath>.\SrcFile\Func\Sha1.c</FilePath>
             </File>
             <File>
-              <FileName>Uc8118.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\SrcFile\Func\Uc8118.c</FilePath>
-            </File>
-            <File>
               <FileName>NFCFunc.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\SrcFile\Func\NFCFunc.c</FilePath>
+            </File>
+            <File>
+              <FileName>Uc8118.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SrcFile\Func\Uc8118.c</FilePath>
             </File>
           </Files>
         </Group>

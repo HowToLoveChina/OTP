@@ -89,7 +89,7 @@ void AlgSymmMacFun2(u1 * pu1Data, u2 *pu2DataSize, u1 *pu1KeyVal,  u1* pu1IV)	//
 
 		}
 		//vScu_SetSysClk32K();		//9600_test
-		vScu_SetSysClk64K();
+		vScu_SetSysClk64K();		
 		return;
 	
 }

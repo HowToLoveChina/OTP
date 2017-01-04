@@ -4,6 +4,7 @@ Acess the M24LR04E
 #include "NFCFunc.h"
 #include <intrins.h> 
 
+
 void I2C_DELAY(void)
 {
 	_nop_();_nop_();_nop_();_nop_();
@@ -21,33 +22,33 @@ void mDelay(UINT8 k)
 	}
 }
 //----------------------------------------------------------------
-//OK
+//I2C start condition
 //----------------------------------------------------------------
 void I2C_Start(void)
 {
 	SDA_HIGH();
-	I2C_DELAY();	
+//	I2C_DELAY();	
 	
 	SCL_HIGH();
-	I2C_DELAY();
+//	I2C_DELAY();
 	
 	SDA_LOW();
-	I2C_DELAY();	
+//	I2C_DELAY();	
 		
 }
 //----------------------------------------------------------------
-//OK
+//I2C stop condition
 //----------------------------------------------------------------
 void I2C_Stop(void)
 {
 	SDA_LOW();
-	I2C_DELAY();
+//	I2C_DELAY();
 	
 	SCL_HIGH();
-	I2C_DELAY();
+//	I2C_DELAY();
 	
 	SDA_HIGH();
-	I2C_DELAY();
+//	I2C_DELAY();
 }
 
 //----------------------------------------------------------------
@@ -56,13 +57,13 @@ void I2C_Stop(void)
 void sendNoAck(void)
 {
 	SDA_HIGH();
-	I2C_DELAY();
+//	I2C_DELAY();
 	
 	SCL_HIGH();
-	I2C_DELAY();
+//	I2C_DELAY();
 	
 	SCL_LOW();
-	I2C_DELAY();		
+//	I2C_DELAY();		
 }
 //----------------------------------------------------------------
 // 0 = noACK; 1 = ACK ;
@@ -73,26 +74,26 @@ UINT8 RecvACK(void)
 	UINT8 data_temp;
 
 	SCL_LOW();	
-	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
-	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();		
+//	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
+//	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();		
 	SDA_InEn();
     data_temp = IOMP1DIN&SDA_PIN; 
 	
 	SCL_HIGH(); 
 	
   data_temp = ~(IOMP1DIN&SDA_PIN); // GPIO14 ACK LOW active 
-	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
-	_nop_();_nop_();_nop_();_nop_();_nop_();	
+//	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
+//	_nop_();_nop_();_nop_();_nop_();_nop_();	
 	SCL_LOW(); 
 
-	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
-	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
-	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
-	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
-	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
-	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
-	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
-	_nop_();_nop_();	
+//	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
+//	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
+//	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
+//	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
+//	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
+//	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
+//	_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
+//	_nop_();_nop_();	
 
 	SDA_OutEn();
 	
@@ -100,7 +101,6 @@ UINT8 RecvACK(void)
 }
 
 //----------------------------------------------------------------
-//OK
 // a positive clock edge clock a bit into the ROM
 //----------------------------------------------------------------
 void writeByte(UINT8 datum)
@@ -120,10 +120,10 @@ void writeByte(UINT8 datum)
 		{
 			SDA_LOW();
 		}
-		I2C_DELAY();
+//		I2C_DELAY();
 		
 		SCL_HIGH();
-		I2C_DELAY();			
+//		I2C_DELAY();			
 		
 		datum<<=1 ; 
 	}	
@@ -157,7 +157,7 @@ void writeFourBytesToROM(UINT8 datum[], UINT16 address, UINT16 num)
 /*~~~~~~~~~~~~~~~~~~~~~~~ API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /*-----------------------------------------------------------------
 write some bytes to sequential address
-TarAddr µØÖ·±ØÐë4µÄ±¶ÊýÇ
+TarAddr µØÖ·±ØÐë4µÄ±¶Êý
 -----------------------------------------------------------------*/
 void writeToROM(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
 {
@@ -177,7 +177,7 @@ void writeToROM(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
       align_mem_offset = bytes_to_write;
     }
     writeFourBytesToROM(pdata_index, mem_addr, align_mem_offset);
-		mDelay(5);
+//		mDelay(5);
 
     pdata_index += align_mem_offset;
     mem_addr += align_mem_offset;
@@ -238,8 +238,8 @@ void readFromROM(UINT8 datum[], UINT16 address, UINT16 num)
 		
 		}
 	
-		_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
-		_nop_();_nop_();		
+//		_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
+//		_nop_();_nop_();		
 		
 		SCL_LOW();		
 		
@@ -248,12 +248,12 @@ void readFromROM(UINT8 datum[], UINT16 address, UINT16 num)
 		SDA_LOW();
 		
 		SCL_HIGH();
-		_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
-		_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
-		_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();		
+//		_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
+//		_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();	
+//		_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();		
 		
 		SCL_LOW();
-		I2C_DELAY();		
+//		I2C_DELAY();		
 	}
 	sendNoAck() ;
 	
@@ -263,7 +263,8 @@ void readFromROM(UINT8 datum[], UINT16 address, UINT16 num)
 /********************************************************************
 IIC Init
 ********************************************************************/
-void IIC_HostInit(void)
+//void IIC_HostInit(void)
+void NFC_Init(void)
 {
 	vScu_SetSysClkOsc2M();
 	
@@ -300,12 +301,25 @@ UINT8 Read_NFC_Busy(void)
 	else	
 		 return FALSE;
 }
-
+/********************************************************************
+// Fuction : Set nfc busy status
+// Param: void
+// Return: void
+// Author: Colin
+// Data: 2016/12/9 
+********************************************************************/
 void Set_NFC_Busy(void)
 {
   UINT8 busy_flag= NFC_IS_BUSY; 
   writeToROM(&busy_flag, NFC_BUSY_ADDR, NFC_FLAG_NUM);
 }
+/********************************************************************
+// Fuction : Clear nfc busy status
+// Param: void
+// Return: void
+// Author: Colin
+// Data: 2016/12/9 
+********************************************************************/
 void Clear_NFC_Busy(void)
 {
   UINT8 busy_flag= NFC_NOT_BUSY; 
@@ -337,7 +351,7 @@ UINT8 NFC_Busy_Status(void)
 
 }
 /********************************************************************
-// Fuction : Mcu already paper data and send to nfc device,set the flag
+// Fuction : Mcu already paper data and send the flag to nfc device
 // Param: void
 // Return: void
 // Author: Colin
@@ -393,8 +407,8 @@ void Read_NFC(UINT8 datum[], UINT16 address, UINT16 num)
 {
 // vScu_SetSysClkOsc2M();
  while(NFC_Busy_Status()); // wait for nfc is not busy
- //while(Read_NFC_Busy());
- Set_NFC_Busy();
+// while(Read_NFC_Busy());
+ Set_NFC_Busy();										 
  readFromROM(datum, address, num);
  Clear_NFC_Busy();
 }
@@ -411,7 +425,7 @@ void Write_NFC(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
 {	
 	//vScu_SetSysClkOsc2M();
 	while(NFC_Busy_Status());// wait for nfc is not busy
-//	while(Read_NFC_Busy());
+//  while(Read_NFC_Busy());
 	Set_NFC_Busy();
 	writeToROM(pData, TarAddr, NbByte);
 	MCU_Data_EN();

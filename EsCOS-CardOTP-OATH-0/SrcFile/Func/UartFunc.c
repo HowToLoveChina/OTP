@@ -523,16 +523,16 @@ u2 ReceiveData_Poll(void)					//用TBC来做超时
 #else
 u2 ReceiveData_Poll(void)					//Use NFC 
 {
-	u1 u1MacChk;
+//	u1 u1MacChk;
 	u1 u1RevDataFlag;
 	u2 u2Status;
-	u1	pu1IV[16];
+//	u1	pu1IV[16];
 	u2	u2Len;
-	u1 pu1MacKey[16];
+//	u1 pu1MacKey[16];
 	u1 u1Index;
 	u1 i;
 	//u1 u1ReceData;
-	//add nfc busy judge by colin 2016/12/12
+	// add nfc busy judge by colin 2016/12/12
 	if(NFC_Busy_Status() == TRUE)	// NFC is busy
 	{
 		return RSP_RECEIVE_ERR;
@@ -567,7 +567,7 @@ u2 ReceiveData_Poll(void)					//Use NFC
 //	u1MacChk = 0;
 //	for(i=0;i<16;i++) pu1MacKey[i] =g_u1PriKey[i];	
 //	memset(pu1IV, 0x00, 0x10);
-//	u2Len = g_UART_COM_BUF[OFFSET_LEN + u1Index]+OP_HEAD_LEN;
+	u2Len = g_UART_COM_BUF[OFFSET_LEN + u1Index]+OP_HEAD_LEN;
 //	AlgSymmMacFun2(&g_UART_COM_BUF[u1Index], &u2Len, pu1MacKey,pu1IV);
 //	u2Len = g_UART_COM_BUF[OFFSET_LEN + u1Index]+OP_HEAD_LEN;
 //	if (0 != memcmp(g_UART_COM_BUF+u2Len+u1Index,pu1IV,4)) u1MacChk =0x01;
@@ -577,13 +577,13 @@ u2 ReceiveData_Poll(void)					//Use NFC
 //		u2Status =RSP_CHK_FAIL;
 //	}
 //	else
-	{
+//	{
 		u2Status =RSP_SET_SUCCESS;
 		for(i = 0; i< u2Len+4; i++)
 		{
 			g_UART_COM_BUF[i] = g_UART_COM_BUF[i+u1Index];
 		}
-	}
+//	}
 
 	return u2Status;
 
@@ -675,11 +675,11 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[8] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[9] = pu1IV[2];
 				u1UsartBuffer[10] = pu1IV[3];
-				//vUartSendData(u1UsartBuffer,11);
+				
 				#ifdef __NFC_WITH_BUSY_PIN__
 					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,11);
 				#else
-					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,11);
+					vUartSendData(u1UsartBuffer,11);
 				#endif
 				
 			}
@@ -706,12 +706,12 @@ void USART_TxRsp(u2 u2Rsp,u1 u1Opcode)
 				u1UsartBuffer[9] = pu1IV[1];//(u1)u2CRC16Val;
 				u1UsartBuffer[10] = pu1IV[2];
 				u1UsartBuffer[11] = pu1IV[3];
-				//vUartSendData(u1UsartBuffer,12);
+				
 
 				#ifdef __NFC_WITH_BUSY_PIN__
 					Write_NFC(u1UsartBuffer,EEPROM_ADDRESS,12);
 				#else
-					writeToROM(u1UsartBuffer,EEPROM_ADDRESS,12);
+					vUartSendData(u1UsartBuffer,12);
 				#endif
 	//			  memset(u1UsartBuffer,0,64);
 //			}
