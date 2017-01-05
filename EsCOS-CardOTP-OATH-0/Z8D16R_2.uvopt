@@ -193,7 +193,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>15</ColumnNumber>
+      <ColumnNumber>14</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>256</TopLine>
       <CurrentLine>276</CurrentLine>
@@ -298,10 +298,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>14</ColumnNumber>
+      <ColumnNumber>26</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>681</TopLine>
-      <CurrentLine>703</CurrentLine>
+      <TopLine>650</TopLine>
+      <CurrentLine>650</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\UartFunc.c</PathWithFileName>
       <FilenameWithoutPath>UartFunc.c</FilenameWithoutPath>
@@ -370,8 +370,8 @@
       <Focus>0</Focus>
       <ColumnNumber>5</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>424</TopLine>
-      <CurrentLine>424</CurrentLine>
+      <TopLine>106</TopLine>
+      <CurrentLine>106</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Func\NFCFunc.c</PathWithFileName>
       <FilenameWithoutPath>NFCFunc.c</FilenameWithoutPath>
@@ -417,10 +417,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>5</ColumnNumber>
+      <ColumnNumber>17</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>799</TopLine>
-      <CurrentLine>799</CurrentLine>
+      <TopLine>931</TopLine>
+      <CurrentLine>943</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\OtpFrame.c</PathWithFileName>
       <FilenameWithoutPath>OtpFrame.c</FilenameWithoutPath>
@@ -445,10 +445,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>3</ColumnNumber>
+      <ColumnNumber>15</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>70</TopLine>
-      <CurrentLine>92</CurrentLine>
+      <TopLine>82</TopLine>
+      <CurrentLine>97</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\SrcFile\Frame\SM4Process.c</PathWithFileName>
       <FilenameWithoutPath>SM4Process.c</FilenameWithoutPath>

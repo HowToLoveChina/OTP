@@ -177,7 +177,7 @@ void writeToROM(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
       align_mem_offset = bytes_to_write;
     }
     writeFourBytesToROM(pdata_index, mem_addr, align_mem_offset);
-//		mDelay(5);
+	mDelay(5);
 
     pdata_index += align_mem_offset;
     mem_addr += align_mem_offset;
@@ -405,7 +405,7 @@ UINT8 PC_Data_EN(void)
 ********************************************************************/
 void Read_NFC(UINT8 datum[], UINT16 address, UINT16 num)
 {
-// vScu_SetSysClkOsc2M();
+ vScu_SetSysClkOsc2M();
  while(NFC_Busy_Status()); // wait for nfc is not busy
 // while(Read_NFC_Busy());
  Set_NFC_Busy();										 
@@ -423,7 +423,7 @@ void Read_NFC(UINT8 datum[], UINT16 address, UINT16 num)
 ********************************************************************/
 void Write_NFC(UINT8 *pData, UINT16 TarAddr, UINT16 NbByte)
 {	
-	//vScu_SetSysClkOsc2M();
+	vScu_SetSysClkOsc2M();
 	while(NFC_Busy_Status());// wait for nfc is not busy
 //  while(Read_NFC_Busy());
 	Set_NFC_Busy();

@@ -523,12 +523,12 @@ u2 ReceiveData_Poll(void)					//用TBC来做超时
 #else
 u2 ReceiveData_Poll(void)					//Use NFC 
 {
-//	u1 u1MacChk;
+	u1 u1MacChk;
 	u1 u1RevDataFlag;
 	u2 u2Status;
-//	u1	pu1IV[16];
+	u1	pu1IV[16];
 	u2	u2Len;
-//	u1 pu1MacKey[16];
+	u1 pu1MacKey[16];
 	u1 u1Index;
 	u1 i;
 	//u1 u1ReceData;
@@ -564,26 +564,26 @@ u2 ReceiveData_Poll(void)					//Use NFC
 
 //	if(u1Index == i)return RSP_DATA_ERR;				//防止数据传错
 
-//	u1MacChk = 0;
-//	for(i=0;i<16;i++) pu1MacKey[i] =g_u1PriKey[i];	
-//	memset(pu1IV, 0x00, 0x10);
+	u1MacChk = 0;
+	for(i=0;i<16;i++) pu1MacKey[i] =g_u1PriKey[i];	
+	memset(pu1IV, 0x00, 0x10);
 	u2Len = g_UART_COM_BUF[OFFSET_LEN + u1Index]+OP_HEAD_LEN;
-//	AlgSymmMacFun2(&g_UART_COM_BUF[u1Index], &u2Len, pu1MacKey,pu1IV);
-//	u2Len = g_UART_COM_BUF[OFFSET_LEN + u1Index]+OP_HEAD_LEN;
-//	if (0 != memcmp(g_UART_COM_BUF+u2Len+u1Index,pu1IV,4)) u1MacChk =0x01;
-//
-//	if(u1MacChk)
-//	{
-//		u2Status =RSP_CHK_FAIL;
-//	}
-//	else
-//	{
+	AlgSymmMacFun2(&g_UART_COM_BUF[u1Index], &u2Len, pu1MacKey,pu1IV);
+	u2Len = g_UART_COM_BUF[OFFSET_LEN + u1Index]+OP_HEAD_LEN;
+	if (0 != memcmp(g_UART_COM_BUF+u2Len+u1Index,pu1IV,4)) u1MacChk =0x01;
+
+	if(u1MacChk)
+	{
+		u2Status =RSP_CHK_FAIL;
+	}
+	else
+	{
 		u2Status =RSP_SET_SUCCESS;
 		for(i = 0; i< u2Len+4; i++)
 		{
 			g_UART_COM_BUF[i] = g_UART_COM_BUF[i+u1Index];
 		}
-//	}
+	}
 
 	return u2Status;
 
